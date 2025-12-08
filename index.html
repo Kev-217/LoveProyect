@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imperfectamente Feliz - Para Dana</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        /* --- ESTILOS GENERALES (BASE) --- */
+        :root {
+            --bg-color: #050510;
+            --text-gold: #FFD700;
+            --accent-blue: #00FFFF;
+            --accent-purple: #9D00FF;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Georgia', serif;
+            /* Elegante para el poema */
+            overflow-x: hidden;
+        }
+
+        /* --- PANTALLA DE CARGA (TERMINAL) --- */
+        #terminal-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+            padding: 20px;
+        }
+
+        .typing-effect {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: left;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #enter-btn {
+            padding: 15px 30px;
+            background: transparent;
+            border: 2px solid var(--accent-blue);
+            color: var(--accent-blue);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.5s;
+            box-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        #enter-btn:hover {
+            background: var(--accent-blue);
+            color: #000;
+        }
+
+        /* --- FONDO ANIMADO (PARTÍCULAS) --- */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background: radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%);
+        }
+
+        /* Mariposas Azules (Estilo Cadáver de la Novia) */
+        .butterfly {
+            position: absolute;
+            top: 100vh;
+            pointer-events: none;
+            /* Para que no estorben al click */
+            z-index: 0;
+            /* Detrás del texto pero visible */
+            opacity: 0;
+        }
+
+        .butterfly::before {
+            content: '🦋';
+            display: block;
+            /* Filtro Azul Espectral */
+            filter: hue-rotate(200deg) brightness(200%) grayscale(30%) drop-shadow(0 0 8px #00bbff);
+            /* Animación de aleteo suave */
+            animation: wing-flap 0.5s infinite alternate;
+        }
+
+        @keyframes fly {
+            0% {
+                transform: translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: var(--opacity);
+            }
+
+            /* Usamos variable para opacidad */
+            100% {
+                transform: translateY(-110vh) translateX(50px) rotate(20deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes wing-flap {
+            0% {
+                transform: scaleX(1);
+            }
+
+            100% {
+                transform: scaleX(0.8);
+            }
+        }
+
+
+        /* --- CONTENEDOR DEL POEMA --- */
+        .poem-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 100px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stanza {
+            margin-bottom: 80px;
+            /* Espacio entre estrofas */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1.5s ease-out;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .stanza.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Destacar palabras clave */
+        .gold-text {
+            color: var(--text-gold);
+            font-weight: bold;
+        }
+
+        .blue-text {
+            color: var(--accent-blue);
+            text-shadow: 0 0 5px var(--accent-blue);
+        }
+
+        /* --- CARRUSEL (SWIPER) OPTIMIZADO 3:4 --- */
+        .swiper {
+            width: 80%;
+            /* Ocupa el 80% del ancho de la pantalla */
+            /* TRUCO PRO: Calculamos la altura basada en tu proporción 3:4 */
+            aspect-ratio: 3 / 4;
+            margin: 50px auto;
+            /* Centrado */
+            border-radius: 20px;
+            /* Bordes un poco más curvos */
+            box-shadow: 0 0 30px rgba(157, 0, 255, 0.4);
+            /* Glow morado */
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        /* Ajuste perfecto para imágenes y videos */
+        .swiper-slide img,
+        .swiper-slide video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Recorta los bordes para llenar la carta */
+            border-radius: 15px;
+            /* Bordes redondeados */
+            background-color: #000;
+            /* Fondo negro mientras carga */
+        }
+
+        /* --- VOTOS FINALES (ANILLO) --- */
+        .final-vow {
+            font-size: 1.5rem;
+            color: var(--text-gold);
+            border: 1px solid var(--text-gold);
+            padding: 30px;
+            margin-top: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            font-style: italic;
+        }
+
+        /* --- REPRODUCTOR OCULTO --- */
+        .audio-control {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="terminal-loader">
+        <div class="typing-effect" id="console-text"></div>
+        <button id="enter-btn">[ EJECUTAR PROTOCOLO KINTSUGI ]</button>
+    </div>
+
+    <div id="canvas-container">
+    </div>
+
+    <audio id="audio1" loop class="audio-control">
+        <source src="mamichula.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audio2" loop class="audio-control">
+        <source src="piano.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="poem-container">
+
+        <div class="stanza">
+            Yo fui el viajero ciego que soltó tu mano,<br>
+            buscando un falso fuego en mapas extranjeros;<br>
+            creí que el paraíso era un <span class="gold-text">lugar lejano</span>,<br>
+            y perdí la ruta por mirar a otros cielos.
+        </div>
+
+        <div class="stanza">
+            Caminé persiguiendo un oasis inventado,<br>
+            una espiga dorada que solo fue reflejo;<br>
+            idealizando sombras, sin haberlas tocado,<br>
+            mientras tú te rompías a solas frente al espejo.
+        </div>
+
+        <div class="stanza">
+            Te dejé allí dormida, mi pequeña <span class="gold-text">albondiguita</span>,<br>
+            huyendo de un silencio que no supe llenar;<br>
+            Busqué en la falsa magia lo que el <span class="gold-text">ego</span> necesita,<br>
+            sin ver que era tu calma mi forma de respirar.
+        </div>
+
+        <div class="stanza">
+            Pero el <span class="gold-text">karma</span>, maestro de lecciones tan crudas,<br>
+            me obligó a ver de lejos tu nueva libertad;<br>
+            te vi brillar entre tantos, ajena a mis dudas,<br>
+            con la fuerza imponente de tu propia verdad.
+        </div>
+
+        <div class="stanza">
+            Mis celos fueron lava, mi mente una herida,<br>
+            imaginando manos rozando lo que amé;<br>
+            escotes que lucías, segura y decidida,<br>
+            mientras yo en mi vacío, borracho te lloré.
+        </div>
+
+        <div class="stanza">
+            En mis noches de frío buscaba a mi <span class="gold-text">sirena</span>,<br>
+            ese <span class="gold-text">dulce tarareo</span> que al sueño me llevaba;<br>
+            quería ser tu <span class="gold-text">borreguito</span>, purgar mi condena,<br>
+            volver a ese refugio que en tu piel me guardaba.
+        </div>
+
+        <div class="stanza">
+            Pero el hambre nos ganó, rompimos la distancia,<br>
+            la carne fue la goma para el desconsuelo;<br>
+            tu cuerpo había cambiado, noté la discrepancia,<br>
+            tus curvas dibujaban un nuevo desvelo.
+        </div>
+
+        <div class="stanza">
+            Volvimos a la cama sin títulos ni jueces,<br>
+            viviendo en esa casa nuestra propia anarquía;<br>
+            haciéndolo con labia, dos o tres mil veces,<br>
+            llenando con gemidos la estancia vacía.
+        </div>
+
+        <div class="stanza">
+            Ahí encontré mi paz, en el <span class="gold-text">fruto sagrado</span>,<br>
+            ese dulce remedio para mi ansiedad;<br>
+            el sabor que curó mis días cansados,<br>
+            sentirme en casa, a salvo, en plena oscuridad.
+        </div>
+
+        <div class="stanza">
+            Jugamos al caos, <span class="gold-text">huevos revueltos</span>,<br>
+            gritos de placer fueron mi absolución;<br>
+            con mis dedos sedientos, rápidos y sueltos,<br>
+            te di lo que callabas en cada rincón.
+        </div>
+
+        <div class="stanza">
+            En menos de un mes descubrimos, piel contra piel,<br>
+            lo que un año de novios no supo enseñar;<br>
+            que el sexo no es tan solo un acto de placer,<br>
+            sino un lenguaje nuevo para <span class="gold-text">reaprender a amar</span>.
+        </div>
+
+        <div class="stanza">
+            Y ahí cambió el sistema, se reescribió el código,<br>
+            ya no eras la niña que huía a dormir;<br>
+            te vi mujer inmensa, rompiendo el protocolo,<br>
+            enseñándome a quedarme, a luchar y a sentir.
+        </div>
+
+        <div class="stanza">
+            Volvimos rotos, con las manos abiertas,<br>
+            tú con tu pelo nuevo, yo con mi vieja culpa;<br>
+            cruzamos el umbral de las puertas inciertas,<br>
+            pidiendo al universo una segunda disculpa.
+        </div>
+
+        <div class="stanza">
+            No fue borrón ni cuenta nueva,<br>
+            fue aceptar la historia, mirarnos las <span class="gold-text">heridas</span>;<br>
+            tú callaste mi error para salvar mi emblema,<br>
+            y ante tus padres fuiste mi escudo, mi vida.
+        </div>
+
+        <div class="stanza">
+            Esa noche en <span class="gold-text">Wings</span>, con una <span class="gold-text">rosa
+                improvisada</span>,<br>
+            envuelta en aluminio, imperfecta y real;<br>
+            te pedí que volvieras, mi niña, mi amada,<br>
+            a escribir con mi pluma un nuevo final.
+        </div>
+
+        <div class="stanza" id="music-trigger">
+            Hoy sé que no eres musa, eres algo más grande,<br>
+            eres los cuatro elementos de mi propia estación;<br>
+            eres <span class="blue-text">Fuego</span> que calienta cuando el frío se expande,<br>
+            la <span class="gold-text">pasión</span> que con unos mangos me da relajación.
+        </div>
+
+        <div class="stanza">
+            Eres <span class="blue-text">Agua</span> que limpia con llanto cristalino,<br>
+            recordándome lo <span class="gold-text">frágiles</span> que somos al amar;<br>
+            eres <span class="blue-text">Viento</span> que <span class="gold-text">empuja</span> mi barco en el
+            camino,<br>
+            cuando el estrés del mundo me quiere sofocar.
+        </div>
+
+        <div class="stanza">
+            Pero sobre todo eres <span class="blue-text">Tierra</span>, mi suelo firme,<br>
+            donde plantamos <span class="gold-text">frutos</span> de esfuerzo y de valor;<br>
+            donde saco dieces sin llegar a destruirme,<br>
+            porque tu paz me ayuda a ser un triunfador.
+        </div>
+
+        <div class="stanza">
+            Sí, el "clic" fue un destello, una manzana dulce,<br>
+            un veneno que un día me atreví a probar;<br>
+            pero tú eres la vida que hace que me impulse,<br>
+            la <span class="gold-text">compañera eterna</span> con quien quiero luchar.
+        </div>
+
+        <div class="stanza">
+            Quizás no somos perfectos, ni cuentos de hadas,<br>
+            quizás a veces falte la chispa o la fluidez;<br>
+            pero hay coraje en nuestras manos entrelazadas,<br>
+            y ganas de quedarnos hasta la vejez.
+        </div>
+
+        <div class="stanza">
+            Entendí a la mala, perdiendo el camino,<br>
+            que amar no es colonizar, es ceder y crecer;<br>
+            que tú eres mi certeza, mi hogar, mi destino,<br>
+            y que la entrega, mi vida... siempre vence al placer.
+        </div>
+
+        <div class="stanza">
+            No quiero más musas viviendo en mi mente,<br>
+            te quiero a ti, Dana, con tu luz y tu gris;<br>
+            aquí estoy en mi barco, contigo al frente,<br>
+            siendo, por fin, <span class="gold-text">imperfectamente feliz</span>.
+        </div>
+
+        <div class="swiper mySwiper" id="gallery-trigger">
+            <div class="swiper-wrapper">
+
+                <div class="swiper-slide">
+                    <img src="foto1.jpg" loading="lazy" alt="Nosotros">
+                    <div class="swiper-lazy-preloader"></div>
+                </div>
+
+                <div class="swiper-slide">
+                    <video src="video1.mp4" muted loop playsinline class="slide-video"></video>
+                </div>
+
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <div class="stanza final-vow">
+            Con esta mano sostendré tus anhelos,<br>
+            tu copa nunca estará vacía;<br>
+            seré tu vino, tu luz en los cielos,<br>
+            y con este anillo...<br>
+            <span style="font-size: 2rem; text-shadow: 0 0 20px gold;">te pido que seas mía</span>
+        </div>
+
+        <br><br><br><br>
+        <p style="font-size: 0.8rem; color: #555;">Compilado con amor v2.0</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        // --- 1. LÓGICA DE LA TERMINAL ---
+        const text = [
+            "> System check...",
+            "> Critical Error: Heartbroken.",
+            "> Scanning for patch...",
+            "> Loading 'August 2025'...",
+            "> Rewriting core memories...",
+            "> Protocol: KINTSUGI initialized."
+        ];
+        let lineIndex = 0;
+        let charIndex = 0;
+        const consoleDiv = document.getElementById('console-text');
+        const enterBtn = document.getElementById('enter-btn');
+        const loader = document.getElementById('terminal-loader');
+        const audio1 = document.getElementById('audio1');
+        const audio2 = document.getElementById('audio2');
+
+        function typeWriter() {
+            if (lineIndex < text.length) {
+                if (charIndex < text[lineIndex].length) {
+                    consoleDiv.innerHTML += text[lineIndex].charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typeWriter, 50);
+                } else {
+                    consoleDiv.innerHTML += "<br>";
+                    lineIndex++;
+                    charIndex = 0;
+                    setTimeout(typeWriter, 300);
+                }
+            } else {
+                enterBtn.style.opacity = "1";
+            }
+        }
+
+        typeWriter();
+
+        enterBtn.addEventListener('click', () => {
+            // Iniciar música 1
+            audio1.volume = 0.5; // Volumen inicial
+            audio1.play();
+            // Desvanecer loader
+            loader.style.transition = "opacity 1s";
+            loader.style.opacity = "0";
+            setTimeout(() => { loader.style.display = "none"; }, 1000);
+        });
+
+        // --- 2. GENERADOR DE MARIPOSAS MEJORADO ---
+        function createButterfly() {
+            const b = document.createElement('div');
+            b.classList.add('butterfly');
+
+            // 1. POSICIÓN ALEATORIA (Eje X)
+            b.style.left = Math.random() * 100 + "vw";
+
+            // 2. TAMAÑO ALEATORIO (Dinamismo)
+            // Genera mariposas entre 15px (lejos) y 45px (cerca)
+            const size = Math.random() * 30 + 15;
+            b.style.fontSize = size + "px";
+
+            // 3. VELOCIDAD VARIABLE
+            // Las más grandes (cerca) suben más rápido, las pequeñas más lento
+            const duration = (Math.random() * 5 + 8); // Entre 8s y 13s
+            b.style.animation = `fly ${duration}s linear forwards`;
+
+            // 4. OPACIDAD Y DESENFOQUE (Profundidad de campo)
+            // Si es pequeña, es más transparente y borrosa (está lejos)
+            const opacity = Math.random() * 0.5 + 0.4; // Entre 0.4 y 0.9
+            b.style.setProperty('--opacity', opacity);
+
+            if (size < 25) {
+                b.style.filter = "blur(2px)"; // Efecto de desenfoque para las lejanas
+            }
+
+            document.getElementById('canvas-container').appendChild(b);
+
+            // Limpieza de memoria
+            setTimeout(() => { b.remove() }, duration * 1000);
+        }
+
+        // GENERACIÓN MASIVA
+        // Antes era 800ms. Ahora 500ms = ¡Muchas más mariposas!
+        setInterval(createButterfly, 500);
+
+        // --- 3. SCROLL REVEAL (Poema) ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.stanza').forEach(el => observer.observe(el));
+        document.querySelector('.swiper').classList.add('visible'); // El swiper aparece igual
+
+        // --- 4. CONTROL DE AUDIO DUAL & CARRUSEL ---
+        // Detectar cuando llegamos a la zona de cambio
+        const musicTrigger = document.getElementById('music-trigger');
+        const galleryTrigger = document.getElementById('gallery-trigger');
+        let musicSwitched = false;
+
+        window.addEventListener('scroll', () => {
+            const triggerPosition = musicTrigger.getBoundingClientRect().top;
+            const galleryPosition = galleryTrigger.getBoundingClientRect().top;
+            const screenPosition = window.innerHeight;
+
+            // Lógica: Cambio de Mamichula a Piano (En los Elementos)
+            if (triggerPosition < screenPosition / 1.5 && !musicSwitched) {
+                musicSwitched = true;
+                crossfadeAudio(audio1, audio2);
+            }
+
+            // Lógica: Subir volumen en el Carrusel
+            if (galleryPosition < screenPosition / 2) {
+                if (audio2.volume < 0.9) audio2.volume = 1.0;
+            }
+        });
+
+        function crossfadeAudio(trackOut, trackIn) {
+            trackIn.volume = 0;
+            trackIn.play();
+
+            let vol = 0;
+            const interval = setInterval(() => {
+                if (vol < 1) {
+                    vol += 0.05;
+                    trackIn.volume = Math.min(vol, 1);
+                    trackOut.volume = Math.max(1 - vol, 0);
+                } else {
+                    trackOut.pause();
+                    clearInterval(interval);
+                }
+            }, 200); // Transición suave de 4 segundos aprox
+        }
+
+        // --- 5. CONFIGURACIÓN AVANZADA DEL CARRUSEL ---
+        const swiper = new Swiper(".mySwiper", {
+            effect: "cards",       // Efecto de baraja de cartas (muy romántico)
+            grabCursor: true,      // Manita para agarrar
+            loop: true,            // Bucle infinito (puedes girar y girar)
+
+            // Configuración de las cartas
+            cardsEffect: {
+                perSlideOffset: 8, // Separación entre cartas
+                perSlideRotate: 2, // Rotación sutil
+                slideShadows: true, // Sombras realistas
+            },
+
+            pagination: {
+                el: ".swiper-pagination",
+                dynamicBullets: true, // Bolitas que cambian de tamaño
+            },
+
+            // LÓGICA INTELIGENTE DE VIDEOS
+            on: {
+                // Cuando cambias de slide (diapositiva)
+                slideChangeTransitionEnd: function () {
+                    // 1. Pausar TODOS los videos primero
+                    document.querySelectorAll('.slide-video').forEach(vid => {
+                        vid.pause();
+                        vid.currentTime = 0; // Reiniciar video
+                    });
+
+                    // 2. Buscar si el slide ACTIVO tiene un video
+                    const activeSlide = this.slides[this.activeIndex];
+                    const activeVideo = activeSlide.querySelector('video');
+
+                    // 3. Si hay video, darle Play
+                    if (activeVideo) {
+                        activeVideo.play();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
