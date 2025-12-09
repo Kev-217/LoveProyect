@@ -78,6 +78,7 @@
             z-index: -1;
             pointer-events: none;
             background: radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%);
+            transition: background 3s ease;
         }
 
         /* Mariposas Azules (Estilo Cadáver de la Novia) */
@@ -138,15 +139,45 @@
             z-index: 10;
         }
 
+        /* --- EFECTO CRISTAL (GLASSMORPHISM) --- */
         .stanza {
-            margin-bottom: 80px;
-            /* Espacio entre estrofas */
+            margin-bottom: 60px;
+            padding: 30px;
+            border-radius: 20px;
+            /* La magia del vidrio: */
+            background: rgba(255, 255, 255, 0.03);
+            /* Blanco casi transparente */
+            backdrop-filter: blur(10px);
+            /* Desenfoque del fondo */
+            -webkit-backdrop-filter: blur(10px);
+            /* Para Safari/iPhone */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* Borde sutil */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+
+            /* Animación base */
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 1.5s ease-out;
-            font-size: 1rem;
-            line-height: 1.8;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            transform: translateY(50px) scale(0.9);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            /* Movimiento suave */
+        }
+
+        /* Cuando se hace visible */
+        .stanza.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            background: rgba(255, 255, 255, 0.07);
+            /* Se ilumina un poco al leer */
+            border-color: rgba(255, 215, 0, 0.3);
+            /* Borde dorado sutil */
+        }
+
+        .final-vow {
+            /* Hacemos que los votos resalten más */
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--text-gold);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.15);
         }
 
         .stanza.visible,
@@ -212,6 +243,118 @@
         .audio-control {
             display: none;
         }
+
+        /* --- MEJORA 1: DESTELLOS AL TOCAR --- */
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--text-gold);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px var(--text-gold), 0 0 20px #fff;
+            animation: sparkle-anim 1s linear forwards;
+            z-index: 999;
+            /* Por encima de todo */
+        }
+
+        @keyframes sparkle-anim {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* --- MEJORA 2: LA LUNA PARALLAX --- */
+        .moon-bg {
+            position: fixed;
+            top: 10%;
+            right: -10%;
+            /* Un poco salida a la derecha */
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #ffffe0 10%, rgba(255, 255, 224, 0) 70%);
+            border-radius: 50%;
+            opacity: 0.15;
+            /* Sutil */
+            z-index: -1;
+            filter: blur(20px);
+            pointer-events: none;
+            transition: transform 0.1s linear;
+        }
+
+        /* --- CANDADO BIOMÉTRICO --- */
+        #lock-screen {
+            text-align: center;
+            padding: 50px;
+            border: 1px solid var(--accent-blue);
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #fingerprint-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--text-gold);
+            background: transparent;
+            color: var(--text-gold);
+            font-size: 2rem;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.2s;
+            /* Efecto de latido */
+            animation: pulse-btn 2s infinite;
+        }
+
+        @keyframes pulse-btn {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(255, 215, 0, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+            }
+        }
+
+        /* Barra de progreso circular o fondo de llenado */
+        .fill-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, #FFD700, #ffaa00);
+            transition: height 0.1s linear;
+            /* Se llena con JS */
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        /* Ocultamos los votos al principio */
+        .final-vow.locked {
+            filter: blur(20px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter 2s ease;
+        }
+
+        .final-vow.unlocked {
+            filter: blur(0px);
+        }
     </style>
 </head>
 
@@ -222,8 +365,48 @@
         <button id="enter-btn">[ EJECUTAR PROTOCOLO KINTSUGI ]</button>
     </div>
 
-    <div id="canvas-container">
-    </div>
+    <div id="canvas-container"></div>
+
+    <svg class="kintsugi-crack" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M50,-10 Q45,20 55,30 T45,60 T55,90 T50,110" fill="none" stroke="url(#gold-gradient)"
+            stroke-width="0.5" />
+        <defs>
+            <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#bf953f;stop-opacity:0" />
+                <stop offset="50%" style="stop-color:#fcf6ba;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#b38728;stop-opacity:0" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <style>
+        .kintsugi-crack {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+            pointer-events: none;
+            filter: drop-shadow(0 0 5px gold);
+        }
+
+        .kintsugi-crack path {
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: drawCrack 10s ease-out forwards 2s;
+            /* Aparece a los 2s */
+        }
+
+        @keyframes drawCrack {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+    </style>
+
+    <div class="moon-bg" id="moon"></div>
 
     <audio id="audio1" loop class="audio-control">
         <source src="mamichula.mp3" type="audio/mpeg">
@@ -454,16 +637,39 @@
                 <div class="swiper-slide">
                     <video src="14v.mp4" muted loop playsinline class="slide-video"></video>
                 </div>
+
+                <div class="swiper-slide">
+                    <img src="15.jpeg" loading="lazy" alt="06-11">
+                    <div class="swiper-lazy-preloader"></div>
+                </div>
+
+                <div class="swiper-slide">
+                    <video src="16v.mp4" muted loop playsinline class="slide-video"></video>
+                </div>
+
+                <div class="swiper-slide">
+                    <video src="17v.mp4" muted loop playsinline class="slide-video"></video>
+                </div>
             </div>
             <div class="swiper-pagination"></div>
         </div>
 
-        <div class="stanza final-vow">
+        <div id="lock-screen">
+            <div class="fill-overlay" id="fill-bar"></div>
+            <p style="font-family: 'Courier New'; color: var(--accent-blue); margin-bottom: 20px;">
+                ⚠️ ARCHIVO ENCRIPTADO <br>
+                <span style="font-size: 0.8rem">Mantén presionado para reparar el vínculo</span>
+            </p>
+            <button id="fingerprint-btn">❤️</button>
+        </div>
+
+        <div class="stanza final-vow locked" id="final-vow-box">
             Con esta mano sostendré tus anhelos,<br>
             tu copa nunca estará vacía;<br>
-            seré tu vino, tu luz en los cielos,<br>
+            quiero ser tu vino, <br>
+            tu luz en los cielos,<br><br>
             y con este anillo...<br>
-            <span style="font-size: 2rem; text-shadow: 0 0 20px gold;">te pido que seas mía</span>
+            <span style="font-size: 2rem; text-shadow: 0 0 20px gold;">TE PIDO QUE SEAS MÍA</span>
         </div>
 
         <br><br><br><br>
@@ -508,15 +714,64 @@
 
         typeWriter();
 
+        let audioContext, analyser, source;
+
         enterBtn.addEventListener('click', () => {
-            // Iniciar música 1
-            audio1.volume = 0.5; // Volumen inicial
+            // 1. Iniciar Audio Context (Necesario por reglas del navegador)
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+
+            // Conectar Audio 1 (Mamichula) al analizador
+            source = audioContext.createMediaElementSource(audio1);
+            const source2 = audioContext.createMediaElementSource(audio2); // También el piano
+
+            // Ruteo: Audio -> Analizador -> Bocinas
+            source.connect(analyser);
+            source2.connect(analyser);
+            analyser.connect(audioContext.destination);
+            // (Truco: conectamos ambos, aunque solo suene uno a la vez)
+            // Nota simplificada: Para no complicar el código con doble fuente, 
+            // el visualizador reaccionará principalmente al audio activo si gestionamos bien el volumen.
+
             audio1.play();
-            // Desvanecer loader
-            loader.style.transition = "opacity 1s";
+
+            // UI: Desvanecer loader
             loader.style.opacity = "0";
             setTimeout(() => { loader.style.display = "none"; }, 1000);
+
+            // INICIAR BUCLE DE ANIMACIÓN
+            visualize();
         });
+
+        function visualize() {
+            // Array para guardar datos de frecuencia (Graves, Medios, Agudos)
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            function draw() {
+                requestAnimationFrame(draw);
+                analyser.getByteFrequencyData(dataArray);
+
+                // Obtenemos el promedio de volumen de los bajos (primeros bins)
+                let bass = 0;
+                for (let i = 0; i < 10; i++) {
+                    bass += dataArray[i];
+                }
+                const bassAverage = bass / 10; // Valor entre 0 y 255
+
+                // APLICAR AL DOM (Hacer que la luna palpite)
+                // Escala normal 1, crece hasta 1.2 con el bajo
+                const scale = 1 + (bassAverage / 500);
+                const moon = document.getElementById('moon');
+
+                // Si existe la luna, la hacemos latir
+                if (moon) {
+                    moon.style.transform = `scale(${scale}) translateY(${window.scrollY * 0.2}px)`;
+                    // También podemos hacer que brille más
+                    moon.style.boxShadow = `0 0 ${bassAverage}px rgba(255, 255, 224, 0.3)`;
+                }
+            }
+            draw();
+        }
 
         // --- 2. GENERADOR DE MARIPOSAS MEJORADO ---
         function createButterfly() {
@@ -645,6 +900,132 @@
                 }
             }
         });
+
+        // --- MEJORA 1: LÓGICA DE DESTELLOS (TOUCH) ---
+        document.addEventListener('click', (e) => {
+            createSparkle(e.pageX, e.pageY);
+        });
+
+        // También para touch en celular
+        document.addEventListener('touchstart', (e) => {
+            // touchstart puede tener múltiples toques, tomamos el primero
+            const touch = e.touches[0];
+            createSparkle(touch.pageX, touch.pageY);
+        });
+
+        function createSparkle(x, y) {
+            const s = document.createElement('div');
+            s.classList.add('sparkle');
+            s.style.left = x + 'px';
+            s.style.top = y + 'px';
+            document.body.appendChild(s);
+
+            // Color aleatorio entre Dorado y Azul
+            const colors = ['#FFD700', '#00FFFF', '#FFFFFF'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            s.style.background = randomColor;
+            s.style.boxShadow = `0 0 10px ${randomColor}`;
+
+            setTimeout(() => { s.remove(); }, 1000);
+        }
+
+        // --- MEJORA 2: LÓGICA PARALLAX DE LA LUNA ---
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const moon = document.getElementById('moon');
+            // La luna se mueve a 1/5 de la velocidad del scroll (efecto profundidad)
+            moon.style.transform = `translateY(${scrollY * 0.2}px)`;
+        });
+
+        // --- MEJORA 3: TÍTULO DINÁMICO (TAB) ---
+        const originalTitle = document.title;
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                document.title = "Vuelve albondiguita... 🦋";
+            } else {
+                document.title = originalTitle;
+            }
+        });
+
+        // --- MEJORA: ILUMINACIÓN DINÁMICA ---
+        window.addEventListener('scroll', () => {
+            const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+            const bg = document.getElementById('canvas-container');
+
+            // 0% - 30%: Inicio (Azul Noche Triste)
+            if (scrollPercent < 30) {
+                bg.style.background = "radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%)";
+            }
+            // 30% - 60%: Pasión/Caos (Tinte Púrpura Rojizo)
+            else if (scrollPercent >= 30 && scrollPercent < 60) {
+                bg.style.background = "radial-gradient(circle at bottom, #3b0a15 0%, #050510 70%)";
+            }
+            // 60% - 100%: Paz/Oro (Tinte Dorado Cálido)
+            else {
+                bg.style.background = "radial-gradient(circle at bottom, #2e2a0b 0%, #050510 70%)";
+            }
+        });
+
+        // --- LÓGICA DEL CANDADO BIOMÉTRICO ---
+        const btn = document.getElementById('fingerprint-btn');
+        const fill = document.getElementById('fill-bar');
+        const vowBox = document.getElementById('final-vow-box');
+        const lockScreen = document.getElementById('lock-screen');
+        let holdTimer;
+        let progress = 0;
+
+        // Eventos para Mouse y Touch (Celular)
+        const startHold = () => {
+            // Vibración si es celular (Haptic Feedback)
+            if (navigator.vibrate) navigator.vibrate(50);
+
+            holdTimer = setInterval(() => {
+                progress += 2; // Velocidad de llenado
+                fill.style.height = progress + '%';
+
+                // Si llega al 100%
+                if (progress >= 100) {
+                    unlockVow();
+                }
+            }, 30); // Se ejecuta cada 30ms
+        };
+
+        const endHold = () => {
+            clearInterval(holdTimer);
+            if (progress < 100) {
+                progress = 0;
+                fill.style.height = '0%';
+            }
+        };
+
+        function unlockVow() {
+            clearInterval(holdTimer);
+            // 1. Vibración larga de éxito
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+            // 2. Efecto visual
+            lockScreen.style.transition = "opacity 1s, transform 1s";
+            lockScreen.style.opacity = "0";
+            lockScreen.style.transform = "scale(1.5)"; // Explosión
+            setTimeout(() => lockScreen.style.display = 'none', 1000);
+
+            // 3. Revelar Votos
+            vowBox.classList.remove('locked');
+            vowBox.classList.add('unlocked');
+
+            // 4. Subir música al máximo (Clímax)
+            const audio2 = document.getElementById('audio2');
+            audio2.volume = 1.0;
+
+            // AQUÍ ES TU SEÑAL PARA SACAR EL ANILLO
+        }
+
+        btn.addEventListener('mousedown', startHold);
+        btn.addEventListener('mouseup', endHold);
+        btn.addEventListener('mouseleave', endHold);
+
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
+        btn.addEventListener('touchend', endHold);
     </script>
 </body>
 
