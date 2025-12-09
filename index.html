@@ -149,7 +149,8 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
         }
 
-        .stanza.visible {
+        .stanza.visible,
+        .swiper.visible {
             opacity: 1;
             transform: translateY(0);
         }
@@ -563,8 +564,7 @@
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('.stanza').forEach(el => observer.observe(el));
-        document.querySelector('.swiper').classList.add('visible'); // El swiper aparece igual
+        document.querySelectorAll('.stanza, .swiper').forEach(el => observer.observe(el));
 
         // --- 4. CONTROL DE AUDIO DUAL & CARRUSEL ---
         // Detectar cuando llegamos a la zona de cambio
