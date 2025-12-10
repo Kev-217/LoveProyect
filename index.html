@@ -4,18 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Más que un clic... ❤️</title>
+    <title>Imperfectamente Feliz - Para Dana</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
     <style>
         /* =========================================
-           1. VARIABLES Y ESTILOS GLOBALES
+           1. VARIABLES Y CONFIGURACIÓN MAESTRA
            ========================================= */
         :root {
-            /* Paleta de colores definida para fácil mantenimiento */
+            /* Colores del tema */
             --bg-color: #050510;
             --text-gold: #FFD700;
             --accent-blue: #00FFFF;
             --accent-purple: #9D00FF;
+
+            /* --- TIPOGRAFÍA FLUIDA (La magia de la v3.0) --- */
+            /* clamp(mínimo, ideal, máximo) 
+               Esto hace que el texto cambie suavemente de tamaño según la pantalla */
+            --font-size-base: clamp(1rem, 2vw, 1.25rem);
+            --font-size-title: clamp(1.5rem, 5vw, 2.5rem);
+            --spacing-stanza: clamp(20px, 5vh, 40px);
+            /* Espacio entre estrofas */
         }
 
         body {
@@ -23,43 +33,71 @@
             background-color: var(--bg-color);
             color: #fff;
             font-family: 'Georgia', serif;
-            /* Tipografía clásica para dar elegancia al poema */
+            /* Fuente elegante */
             overflow-x: hidden;
-            /* Evita scroll horizontal indeseado */
+            /* Evita scroll horizontal accidental */
+            font-size: var(--font-size-base);
         }
 
         /* =========================================
-           2. PANTALLA DE CARGA (Simulación Terminal)
+           2. PANTALLA DE CARGA (Tipo Hacker/Terminal)
            ========================================= */
         #terminal-loader {
             position: fixed;
+            /* Fijo encima de todo */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: #000;
             z-index: 9999;
-            /* Asegura que esté por encima de todo */
+            /* La capa más alta */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             font-family: 'Courier New', monospace;
-            /* Fuente monoespaciada para efecto hacker/retro */
+            /* Letra de código */
             color: #0f0;
-            /* Verde terminal clásico */
+            /* Verde matrix */
             padding: 20px;
         }
 
+        /* Contenedor del texto que se escribe solo */
         .typing-effect {
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 3vw, 1.5rem);
             margin-bottom: 20px;
             text-align: left;
             width: 100%;
-            max-width: 400px;
-            /* Contenedor del texto que se escribe solo */
+            max-width: 500px;
+            min-height: 100px;
+            /* Reserva espacio para que no "brinque" al escribir */
         }
 
+        /* Barra de carga real */
+        #loading-bar-container {
+            width: 80%;
+            max-width: 400px;
+            height: 4px;
+            background: #333;
+            /* Fondo oscuro de la barra */
+            margin-bottom: 20px;
+            display: none;
+            /* Se oculta hasta que JS lo activa */
+        }
+
+        #loading-bar {
+            height: 100%;
+            width: 0%;
+            /* Empieza vacía */
+            background: var(--accent-blue);
+            transition: width 0.2s;
+            /* Animación suave al llenarse */
+            box-shadow: 0 0 10px var(--accent-blue);
+            /* Brillo neón */
+        }
+
+        /* Botón de inicio */
         #enter-btn {
             padding: 15px 30px;
             background: transparent;
@@ -69,9 +107,17 @@
             font-size: 1rem;
             cursor: pointer;
             opacity: 0;
-            /* Oculto inicialmente hasta que termina el texto */
+            /* Invisible al inicio */
+            pointer-events: none;
+            /* No se puede clicar hasta que cargue */
             transition: all 0.5s;
             box-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        /* Clase para activar el botón cuando todo está listo */
+        #enter-btn.active {
+            opacity: 1;
+            pointer-events: all;
         }
 
         #enter-btn:hover {
@@ -80,78 +126,29 @@
         }
 
         /* =========================================
-           3. FONDO ANIMADO Y EFECTOS
+           3. CANVAS DE FONDO (Mariposas)
            ========================================= */
-        #canvas-container {
+        #bg-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            /* Detrás del contenido */
-            pointer-events: none;
-            /* Permite hacer click a través de él */
+            /* Detrás del texto */
+            /* El gradiente base del fondo */
             background: radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%);
             transition: background 3s ease;
-            /* Transición suave para el cambio de color al hacer scroll */
+            /* Cambio de color suave al hacer scroll */
         }
-
-        /* Estilos de las Mariposas generadas por JS */
-        .butterfly {
-            position: absolute;
-            top: 100vh;
-            /* Empiezan abajo de la pantalla */
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0;
-        }
-
-        .butterfly::before {
-            content: '🦋';
-            display: block;
-            /* Filtros para cambiar el color del emoji a azul espectral */
-            filter: hue-rotate(200deg) brightness(200%) grayscale(30%) drop-shadow(0 0 8px #00bbff);
-            /* Animación interna del aleteo */
-            animation: wing-flap 0.5s infinite alternate;
-        }
-
-        /* Animación de trayectoria de vuelo: sube y se mueve lateralmente */
-        @keyframes fly {
-            0% {
-                transform: translateX(0) rotate(0deg);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: var(--opacity);
-                /* Usa variable dinámica asignada en JS */
-            }
-
-            100% {
-                transform: translateY(-110vh) translateX(50px) rotate(20deg);
-                opacity: 0;
-            }
-        }
-
-        /* Animación de compresión para simular aleteo */
-        @keyframes wing-flap {
-            0% {
-                transform: scaleX(1);
-            }
-
-            100% {
-                transform: scaleX(0.8);
-            }
-        }
-
 
         /* =========================================
-           4. CONTENEDOR DEL POEMA (Glassmorphism)
+           4. ESTILOS DEL POEMA (Glassmorphism)
            ========================================= */
         .poem-container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
+            /* Centrado horizontal */
             padding: 100px 20px;
             text-align: center;
             position: relative;
@@ -160,22 +157,23 @@
 
         .stanza {
             margin-bottom: 60px;
-            padding: 30px;
+            padding: var(--spacing-stanza);
             border-radius: 20px;
             /* Efecto cristal esmerilado */
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            /* Para Safari/iPhone */
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 
-            /* Estado inicial para la animación de entrada (scroll reveal) */
+            /* Estado inicial para animación (invisible y más abajo) */
             opacity: 0;
             transform: translateY(50px) scale(0.9);
             transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* Clase que añade JS cuando el elemento entra en pantalla */
+        /* Cuando JS detecta que es visible, le añade esta clase */
         .stanza.visible {
             opacity: 1;
             transform: translateY(0) scale(1);
@@ -183,22 +181,6 @@
             border-color: rgba(255, 215, 0, 0.3);
         }
 
-        /* Estilo específico para los votos finales */
-        .final-vow {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(15px);
-            border: 2px solid var(--text-gold);
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.15);
-        }
-
-        /* Utilidad para animar también el swiper */
-        .stanza.visible,
-        .swiper.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Clases de utilidad para colores de texto */
         .gold-text {
             color: var(--text-gold);
             font-weight: bold;
@@ -213,15 +195,19 @@
            5. CARRUSEL (SWIPER)
            ========================================= */
         .swiper {
-            width: 80%;
+            width: 90%;
+            max-width: 500px;
             aspect-ratio: 3 / 4;
-            /* Mantiene proporción vertical */
-            margin: 50px auto;
+            /* Proporción vertical */
+            margin: 80px auto;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(157, 0, 255, 0.4);
             opacity: 0;
-            /* Oculto hasta scroll */
             transition: opacity 2s;
+        }
+
+        .swiper.visible {
+            opacity: 1;
         }
 
         .swiper-slide img,
@@ -229,19 +215,18 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Asegura que la imagen cubra todo el slide */
             border-radius: 15px;
             background-color: #000;
         }
 
         /* =========================================
-           6. VOTOS FINALES Y ESTILOS EXTRA
+           6. VOTOS FINALES Y CANDADO
            ========================================= */
         .final-vow {
-            font-size: 1.2rem;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
             color: var(--text-gold);
             border: 1px solid var(--text-gold);
-            padding: 30px;
+            padding: 40px;
             margin-top: 100px;
             background: rgba(0, 0, 0, 0.5);
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
@@ -249,56 +234,23 @@
             font-style: italic;
         }
 
-        .audio-control {
-            display: none;
-            /* Oculta los controles nativos de audio */
-        }
-
-        /* Partículas al hacer click */
-        .sparkle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: var(--text-gold);
-            border-radius: 50%;
-            pointer-events: none;
-            box-shadow: 0 0 10px var(--text-gold), 0 0 20px #fff;
-            animation: sparkle-anim 1s linear forwards;
-            z-index: 999;
-        }
-
-        @keyframes sparkle-anim {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(3);
-                opacity: 0;
-            }
-        }
-
-        /* Luna de fondo con efecto Parallax */
+        /* Luna de fondo */
         .moon-bg {
             position: fixed;
             top: 10%;
             right: -10%;
-            width: 300px;
-            height: 300px;
+            /* Tamaño responsivo de la luna */
+            width: clamp(200px, 40vw, 400px);
+            height: clamp(200px, 40vw, 400px);
             background: radial-gradient(circle, #ffffe0 10%, rgba(255, 255, 224, 0) 70%);
             border-radius: 50%;
             opacity: 0.15;
             z-index: -1;
             filter: blur(20px);
             pointer-events: none;
-            transition: transform 0.1s linear;
-            /* Movimiento suave sincronizado con JS */
         }
 
-        /* =========================================
-           7. SISTEMA DE DESBLOQUEO (CANDADO)
-           ========================================= */
+        /* Caja del Candado */
         #lock-screen {
             text-align: center;
             padding: 50px;
@@ -308,8 +260,12 @@
             margin-top: 50px;
             position: relative;
             overflow: hidden;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
+        /* Botón de Huella/Corazón */
         #fingerprint-btn {
             width: 80px;
             height: 80px;
@@ -321,9 +277,8 @@
             cursor: pointer;
             position: relative;
             z-index: 2;
-            transition: transform 0.2s;
             animation: pulse-btn 2s infinite;
-            /* Latido constante */
+            /* Latido */
         }
 
         @keyframes pulse-btn {
@@ -340,24 +295,22 @@
             }
         }
 
-        /* Barra de progreso de llenado al mantener presionado */
+        /* Relleno amarillo al mantener presionado */
         .fill-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 0%;
-            /* Altura controlada por JS */
+            /* JS cambiará esto */
             background: linear-gradient(to top, #FFD700, #ffaa00);
-            transition: height 0.1s linear;
             z-index: 0;
             opacity: 0.3;
         }
 
-        /* Estados de los votos finales */
+        /* Estados de borrosidad del texto final */
         .final-vow.locked {
             filter: blur(20px);
-            /* Ilegible inicialmente */
             pointer-events: none;
             user-select: none;
             transition: filter 2s ease;
@@ -365,7 +318,26 @@
 
         .final-vow.unlocked {
             filter: blur(0px);
-            /* Revelación */
+        }
+
+        /* Partículas (brillitos al tocar) */
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--text-gold);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px var(--text-gold);
+            animation: sparkle-anim 1s linear forwards;
+            z-index: 999;
+        }
+
+        @keyframes sparkle-anim {
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -374,10 +346,14 @@
 
     <div id="terminal-loader">
         <div class="typing-effect" id="console-text"></div>
+        <div id="loading-bar-container">
+            <div id="loading-bar"></div>
+        </div>
+        <p id="loading-percent" style="font-size: 0.8rem; margin-bottom: 20px; color: #555;">0%</p>
         <button id="enter-btn">[ EJECUTAR PROTOCOLO KINTSUGI ]</button>
     </div>
 
-    <div id="canvas-container"></div>
+    <canvas id="bg-canvas"></canvas>
 
     <svg class="kintsugi-crack" viewBox="0 0 100 100" preserveAspectRatio="none">
         <path d="M50,-10 Q45,20 55,30 T45,60 T55,90 T50,110" fill="none" stroke="url(#gold-gradient)"
@@ -390,7 +366,6 @@
             </linearGradient>
         </defs>
     </svg>
-
     <style>
         .kintsugi-crack {
             position: fixed;
@@ -406,10 +381,8 @@
 
         .kintsugi-crack path {
             stroke-dasharray: 200;
-            /* Prepara el trazo para animación de dibujo */
             stroke-dashoffset: 200;
             animation: drawCrack 10s ease-out forwards 2s;
-            /* Se dibuja a los 2s */
         }
 
         @keyframes drawCrack {
@@ -421,248 +394,93 @@
 
     <div class="moon-bg" id="moon"></div>
 
-    <audio id="audio1" loop class="audio-control">
-        <source src="mamichula.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="audio2" loop class="audio-control">
-        <source src="piano.mp3" type="audio/mpeg">
-    </audio>
-
     <div class="poem-container">
-
-        <div class="stanza">
-            Yo fui el viajero ciego que soltó tu mano,<br>
-            buscando un falso fuego en mapas extranjeros;<br>
-            creí que el paraíso era un <span class="gold-text">lugar lejano</span>,<br>
-            y perdí la ruta por mirar a otros cielos.
+        <div class="stanza">Yo fui el viajero ciego que soltó tu mano,<br>buscando un falso fuego en mapas
+            extranjeros;<br>creí que el paraíso era un <span class="gold-text">lugar lejano</span>,<br>y perdí la ruta
+            por mirar a otros cielos.</div>
+        <div class="stanza">Caminé persiguiendo un oasis inventado,<br>una espiga dorada que solo fue
+            reflejo;<br>idealizando sombras, sin haberlas tocado,<br>mientras tú te rompías a solas frente al espejo.
         </div>
-
-        <div class="stanza">
-            Caminé persiguiendo un oasis inventado,<br>
-            una espiga dorada que solo fue reflejo;<br>
-            idealizando sombras, sin haberlas tocado,<br>
-            mientras tú te rompías a solas frente al espejo.
+        <div class="stanza">Te dejé allí dormida, mi pequeña <span class="gold-text">albondiguita</span>,<br>huyendo de
+            un silencio que no supe llenar;<br>Busqué en la falsa magia lo que el <span class="gold-text">ego</span>
+            necesita,<br>sin ver que era tu calma mi forma de respirar.</div>
+        <div class="stanza">Pero el <span class="gold-text">karma</span>, maestro de lecciones tan crudas,<br>me obligó
+            a ver de lejos tu nueva libertad;<br>te vi brillar entre tantos, ajena a mis dudas,<br>con la fuerza
+            imponente de tu propia verdad.</div>
+        <div class="stanza">Mis celos fueron lava, mi mente una herida,<br>imaginando manos rozando lo que
+            amé;<br>escotes que lucías, segura y decidida,<br>mientras yo en mi vacío, borracho te lloré.</div>
+        <div class="stanza">En mis noches de frío buscaba a mi <span class="gold-text">sirena</span>,<br>ese <span
+                class="gold-text">dulce tarareo</span> que al sueño me llevaba;<br>quería ser tu <span
+                class="gold-text">borreguito</span>, purgar mi condena,<br>volver a ese refugio que en tu piel me
+            guardaba.</div>
+        <div class="stanza">Pero el hambre nos ganó, rompimos la distancia,<br>la carne fue la goma para el
+            desconsuelo;<br>tu cuerpo había cambiado, noté la discrepancia,<br>tus curvas dibujaban un nuevo desvelo.
         </div>
-
-        <div class="stanza">
-            Te dejé allí dormida, mi pequeña <span class="gold-text">albondiguita</span>,<br>
-            huyendo de un silencio que no supe llenar;<br>
-            Busqué en la falsa magia lo que el <span class="gold-text">ego</span> necesita,<br>
-            sin ver que era tu calma mi forma de respirar.
+        <div class="stanza">Volvimos a la cama sin títulos ni jueces,<br>viviendo en esa casa nuestra propia
+            anarquía;<br>haciéndolo con labia, dos o tres mil veces,<br>llenando con gemidos la estancia vacía.</div>
+        <div class="stanza">Ahí encontré mi paz, en el <span class="gold-text">fruto sagrado</span>,<br>ese dulce
+            remedio para mi ansiedad;<br>el sabor que curó mis días cansados,<br>sentirme en casa, a salvo, en plena
+            oscuridad.</div>
+        <div class="stanza">Jugamos al caos, <span class="gold-text">huevos revueltos</span>,<br>gritos de placer fueron
+            mi absolución;<br>con mis dedos sedientos, rápidos y sueltos,<br>te di lo que callabas en cada rincón.</div>
+        <div class="stanza">En menos de un mes descubrimos, piel contra piel,<br>lo que un año de novios no supo
+            enseñar;<br>que el sexo no es tan solo un acto de placer,<br>sino un lenguaje nuevo para <span
+                class="gold-text">reaprender a amar</span>.</div>
+        <div class="stanza">Y ahí cambió el sistema, se reescribió el código,<br>ya no eras la niña que huía a
+            dormir;<br>te vi mujer inmensa, rompiendo el protocolo,<br>enseñándome a quedarme, a luchar y a sentir.
         </div>
-
-        <div class="stanza">
-            Pero el <span class="gold-text">karma</span>, maestro de lecciones tan crudas,<br>
-            me obligó a ver de lejos tu nueva libertad;<br>
-            te vi brillar entre tantos, ajena a mis dudas,<br>
-            con la fuerza imponente de tu propia verdad.
-        </div>
-
-        <div class="stanza">
-            Mis celos fueron lava, mi mente una herida,<br>
-            imaginando manos rozando lo que amé;<br>
-            escotes que lucías, segura y decidida,<br>
-            mientras yo en mi vacío, borracho te lloré.
-        </div>
-
-        <div class="stanza">
-            En mis noches de frío buscaba a mi <span class="gold-text">sirena</span>,<br>
-            ese <span class="gold-text">dulce tarareo</span> que al sueño me llevaba;<br>
-            quería ser tu <span class="gold-text">borreguito</span>, purgar mi condena,<br>
-            volver a ese refugio que en tu piel me guardaba.
-        </div>
-
-        <div class="stanza">
-            Pero el hambre nos ganó, rompimos la distancia,<br>
-            la carne fue la goma para el desconsuelo;<br>
-            tu cuerpo había cambiado, noté la discrepancia,<br>
-            tus curvas dibujaban un nuevo desvelo.
-        </div>
-
-        <div class="stanza">
-            Volvimos a la cama sin títulos ni jueces,<br>
-            viviendo en esa casa nuestra propia anarquía;<br>
-            haciéndolo con labia, dos o tres mil veces,<br>
-            llenando con gemidos la estancia vacía.
-        </div>
-
-        <div class="stanza">
-            Ahí encontré mi paz, en el <span class="gold-text">fruto sagrado</span>,<br>
-            ese dulce remedio para mi ansiedad;<br>
-            el sabor que curó mis días cansados,<br>
-            sentirme en casa, a salvo, en plena oscuridad.
-        </div>
-
-        <div class="stanza">
-            Jugamos al caos, <span class="gold-text">huevos revueltos</span>,<br>
-            gritos de placer fueron mi absolución;<br>
-            con mis dedos sedientos, rápidos y sueltos,<br>
-            te di lo que callabas en cada rincón.
-        </div>
-
-        <div class="stanza">
-            En menos de un mes descubrimos, piel contra piel,<br>
-            lo que un año de novios no supo enseñar;<br>
-            que el sexo no es tan solo un acto de placer,<br>
-            sino un lenguaje nuevo para <span class="gold-text">reaprender a amar</span>.
-        </div>
-
-        <div class="stanza">
-            Y ahí cambió el sistema, se reescribió el código,<br>
-            ya no eras la niña que huía a dormir;<br>
-            te vi mujer inmensa, rompiendo el protocolo,<br>
-            enseñándome a quedarme, a luchar y a sentir.
-        </div>
-
-        <div class="stanza">
-            Volvimos rotos, con las manos abiertas,<br>
-            tú con tu pelo nuevo, yo con mi vieja culpa;<br>
-            cruzamos el umbral de las puertas inciertas,<br>
-            pidiendo al universo una segunda disculpa.
-        </div>
-
-        <div class="stanza">
-            No fue borrón ni cuenta nueva,<br>
-            fue aceptar la historia, mirarnos las <span class="gold-text">heridas</span>;<br>
-            tú callaste mi error para salvar mi emblema,<br>
-            y ante tus padres fuiste mi escudo, mi vida.
-        </div>
-
-        <div class="stanza">
-            Esa noche en <span class="gold-text">Wings</span>, con una <span class="gold-text">rosa
-                improvisada</span>,<br>
-            envuelta en aluminio, imperfecta y real;<br>
-            te pedí que volvieras, mi niña, mi amada,<br>
-            a escribir con mi pluma un nuevo final.
-        </div>
+        <div class="stanza">Volvimos rotos, con las manos abiertas,<br>tú con tu pelo nuevo, yo con mi vieja
+            culpa;<br>cruzamos el umbral de las puertas inciertas,<br>pidiendo al universo una segunda disculpa.</div>
+        <div class="stanza">No fue borrón ni cuenta nueva,<br>fue aceptar la historia, mirarnos las <span
+                class="gold-text">heridas</span>;<br>tú callaste mi error para salvar mi emblema,<br>y ante tus padres
+            fuiste mi escudo, mi vida.</div>
+        <div class="stanza">Esa noche en <span class="gold-text">Wings</span>, con una <span class="gold-text">rosa
+                improvisada</span>,<br>envuelta en aluminio, imperfecta y real;<br>te pedí que volvieras, mi niña, mi
+            amada,<br>a escribir con mi pluma un nuevo final.</div>
 
         <div class="stanza" id="music-trigger">
-            Hoy sé que no eres musa, eres algo más grande,<br>
-            eres los cuatro elementos de mi propia estación;<br>
-            eres <span class="blue-text">Fuego</span> que calienta cuando el frío se expande,<br>
-            la <span class="gold-text">pasión</span> que con unos mangos me da relajación.
+            Hoy sé que no eres musa, eres algo más grande,<br>eres los cuatro elementos de mi propia estación;<br>eres
+            <span class="blue-text">Fuego</span> que calienta cuando el frío se expande,<br>la <span
+                class="gold-text">pasión</span> que con unos mangos me da relajación.
         </div>
-
-        <div class="stanza">
-            Eres <span class="blue-text">Agua</span> que limpia con llanto cristalino,<br>
-            recordándome lo <span class="gold-text">frágiles</span> que somos al amar;<br>
-            eres <span class="blue-text">Viento</span> que <span class="gold-text">empuja</span> mi barco en el
-            camino,<br>
-            cuando el estrés del mundo me quiere sofocar.
-        </div>
-
-        <div class="stanza">
-            Pero sobre todo eres <span class="blue-text">Tierra</span>, mi suelo firme,<br>
-            donde plantamos <span class="gold-text">frutos</span> de esfuerzo y de valor;<br>
-            donde saco dieces sin llegar a destruirme,<br>
-            porque tu paz me ayuda a ser un triunfador.
-        </div>
-
-        <div class="stanza">
-            Sí, el "clic" fue un destello, una manzana dulce,<br>
-            un veneno que un día me atreví a probar;<br>
-            pero tú eres la vida que hace que me impulse,<br>
-            la <span class="gold-text">compañera eterna</span> con quien quiero luchar.
-        </div>
-
-        <div class="stanza">
-            Quizás no somos perfectos, ni cuentos de hadas,<br>
-            quizás a veces falte la chispa o la fluidez;<br>
-            pero hay coraje en nuestras manos entrelazadas,<br>
-            y ganas de quedarnos hasta la vejez.
-        </div>
-
-        <div class="stanza">
-            Entendí a la mala, perdiendo el camino,<br>
-            que amar no es colonizar, es ceder y crecer;<br>
-            que tú eres mi certeza, mi hogar, mi destino,<br>
-            y que la entrega, mi vida... siempre vence al placer.
-        </div>
-
-        <div class="stanza">
-            No quiero más musas viviendo en mi mente,<br>
-            te quiero a ti, Dana, con tu luz y tu gris;<br>
-            aquí estoy en mi barco, contigo al frente,<br>
-            siendo, por fin, <span class="gold-text">imperfectamente feliz</span>.
-        </div>
+        <div class="stanza">Eres <span class="blue-text">Agua</span> que limpia con llanto cristalino,<br>recordándome
+            lo <span class="gold-text">frágiles</span> que somos al amar;<br>eres <span class="blue-text">Viento</span>
+            que <span class="gold-text">empuja</span> mi barco en el camino,<br>cuando el estrés del mundo me quiere
+            sofocar.</div>
+        <div class="stanza">Pero sobre todo eres <span class="blue-text">Tierra</span>, mi suelo firme,<br>donde
+            plantamos <span class="gold-text">frutos</span> de esfuerzo y de valor;<br>donde saco dieces sin llegar a
+            destruirme,<br>porque tu paz me ayuda a ser un triunfador.</div>
+        <div class="stanza">Sí, el "clic" fue un destello, una manzana dulce,<br>un veneno que un día me atreví a
+            probar;<br>pero tú eres la vida que hace que me impulse,<br>la <span class="gold-text">compañera
+                eterna</span> con quien quiero luchar.</div>
+        <div class="stanza">Quizás no somos perfectos, ni cuentos de hadas,<br>quizás a veces falte la chispa o la
+            fluidez;<br>pero hay coraje en nuestras manos entrelazadas,<br>y ganas de quedarnos hasta la vejez.</div>
+        <div class="stanza">Entendí a la mala, perdiendo el camino,<br>que amar no es colonizar, es ceder y
+            crecer;<br>que tú eres mi certeza, mi hogar, mi destino,<br>y que la entrega, mi vida... siempre vence al
+            placer.</div>
+        <div class="stanza">No quiero más musas viviendo en mi mente,<br>te quiero a ti, Dana, con tu luz y tu
+            gris;<br>aquí estoy en mi barco, contigo al frente,<br>siendo, por fin, <span
+                class="gold-text">imperfectamente feliz</span>.</div>
 
         <div class="swiper mySwiper" id="gallery-trigger">
             <div class="swiper-wrapper">
-
-                <div class="swiper-slide">
-                    <img src="1.jpeg" loading="lazy" alt="30-09">
-                    <div class="swiper-lazy-preloader"></div>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="2v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="3v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <img src="4.jpeg" loading="lazy" alt="10-10">
-                    <div class="swiper-lazy-preloader"></div>
-                </div>
-
-                <div class="swiper-slide">
-                    <img src="5.jpeg" loading="lazy" alt="11-10">
-                    <div class="swiper-lazy-preloader"></div>
-                </div>
-
-                <div class="swiper-slide">
-                    <img src="6.jpeg" loading="lazy" alt="21-10">
-                    <div class="swiper-lazy-preloader"></div>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="7v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <img src="8.jpeg" loading="lazy" alt="05-11">
-                    <div class="swiper-lazy-preloader"></div>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="9v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <img src="10.jpeg" loading="lazy" alt="06-11">
-                    <div class="swiper-lazy-preloader"></div>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="11v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="12v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="13v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="14v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <img src="15.jpeg" loading="lazy" alt="06-11">
-                    <div class="swiper-lazy-preloader"></div>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="16v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
-
-                <div class="swiper-slide">
-                    <video src="17v.mp4" muted loop playsinline class="slide-video"></video>
-                </div>
+                <div class="swiper-slide"><img src="1.jpeg" loading="lazy"></div>
+                <div class="swiper-slide"><video src="2v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><video src="3v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><img src="4.jpeg" loading="lazy"></div>
+                <div class="swiper-slide"><img src="5.jpeg" loading="lazy"></div>
+                <div class="swiper-slide"><img src="6.jpeg" loading="lazy"></div>
+                <div class="swiper-slide"><video src="7v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><img src="8.jpeg" loading="lazy"></div>
+                <div class="swiper-slide"><video src="9v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><img src="10.jpeg" loading="lazy"></div>
+                <div class="swiper-slide"><video src="11v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><video src="12v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><video src="13v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><video src="14v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><img src="15.jpeg" loading="lazy"></div>
+                <div class="swiper-slide"><video src="16v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><video src="17v.mp4" muted loop playsinline class="slide-video"></video></div>
             </div>
             <div class="swiper-pagination"></div>
         </div>
@@ -682,398 +500,406 @@
             quiero ser tu vino, <br>
             tu luz en los cielos,<br><br>
             y con este anillo...<br>
-            <span style="font-size: 2rem; text-shadow: 0 0 20px gold;">TE PIDO QUE SEAS MÍA</span>
+            <span
+                style="display: block; font-size: clamp(2rem, 5vw, 3.5rem); text-shadow: 0 0 20px gold; margin-top: 20px;">TE
+                PIDO QUE SEAS MÍA</span>
         </div>
 
         <br><br><br><br>
-        <p style="font-size: 0.8rem; color: #555;">Compilado con amor v2.0</p>
+        <p style="font-size: 0.8rem; color: #555;">Compilado con amor v3.0 (Optimized)</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-        // =========================================
-        // 1. LÓGICA DE LA TERMINAL DE CARGA
-        // =========================================
-        const text = [
-            "> System check...",
-            "> Critical Error: Heartbroken.",
-            "> Scanning for patch...",
-            "> Loading 'August 2025'...",
-            "> Rewriting core memories...",
-            "> Protocol: KINTSUGI initialized."
-        ];
-        let lineIndex = 0;
-        let charIndex = 0;
-        // Referencias al DOM
-        const consoleDiv = document.getElementById('console-text');
-        const enterBtn = document.getElementById('enter-btn');
-        const loader = document.getElementById('terminal-loader');
-        const audio1 = document.getElementById('audio1');
-        const audio2 = document.getElementById('audio2');
 
-        // Función recursiva para simular escritura tipo máquina de escribir
-        function typeWriter() {
-            if (lineIndex < text.length) {
-                if (charIndex < text[lineIndex].length) {
-                    // Escribe caracter por caracter
-                    consoleDiv.innerHTML += text[lineIndex].charAt(charIndex);
-                    charIndex++;
-                    setTimeout(typeWriter, 50); // Velocidad de escritura
-                } else {
-                    // Salto de línea al terminar la frase
-                    consoleDiv.innerHTML += "<br>";
-                    lineIndex++;
-                    charIndex = 0;
-                    setTimeout(typeWriter, 300); // Pausa entre líneas
+    <script>
+        // ==========================================
+        // SECCIÓN 1: PRELOADER REAL (Gestión de Recursos)
+        // ==========================================
+
+        // ⚠️ IMPORTANTE: Asegúrate de que estos nombres son EXACTOS a tus archivos.
+        // Si hay una mayúscula/minúscula diferente, la carga se quedará pegada.
+        const assetsToLoad = [
+            'mamichula.mp3',
+            'piano.mp3'
+            // Opcional: Si quieres pre-cargar la primera foto para que salga instantánea, agrégala aquí:
+            // '1.jpeg' 
+        ];
+
+        // Variables donde guardaremos la música cargada en memoria
+        let audioBuffers = {};
+        // Variables del sistema de audio profesional (Web Audio API)
+        let audioCtx, gainNode1, gainNode2, source1, source2, analyser;
+
+        // Referencias a los elementos visuales de carga
+        const loadingBar = document.getElementById('loading-bar');
+        const loadingPercent = document.getElementById('loading-percent');
+        const enterBtn = document.getElementById('enter-btn');
+        const barContainer = document.getElementById('loading-bar-container');
+
+        // Función asíncrona: Carga los archivos uno por uno
+        async function loadAssets() {
+            barContainer.style.display = "block"; // Muestra la barra
+            let loadedCount = 0;
+
+            // Iniciamos el texto de "hacker" visual mientras carga lo real
+            typeWriter();
+
+            // Creamos una lista de tareas de descarga (Promesas)
+            const promises = assetsToLoad.map(async (url) => {
+                try {
+                    // Pide el archivo al servidor
+                    const response = await fetch(url);
+                    // Lo convierte en datos puros (ArrayBuffer)
+                    const arrayBuffer = await response.arrayBuffer();
+                    audioBuffers[url] = arrayBuffer; // Lo guarda en memoria
+
+                    // Actualiza la barra de progreso
+                    loadedCount++;
+                    const percent = Math.floor((loadedCount / assetsToLoad.length) * 100);
+                    loadingBar.style.width = percent + "%";
+                    loadingPercent.innerText = "Cargando audio: " + percent + "%";
+                } catch (e) {
+                    console.error("Error cargando recurso:", url);
+                    loadingPercent.innerText = "Error en archivo: " + url;
                 }
-            } else {
-                // Muestra el botón cuando termina todo el texto
-                enterBtn.style.opacity = "1";
+            });
+
+            // Espera a que TODO se descargue antes de continuar
+            await Promise.all(promises);
+
+            // Todo listo: Habilita el botón para entrar
+            loadingPercent.innerText = "Recursos listos. Esperando usuario.";
+            enterBtn.classList.add('active');
+        }
+
+        // ==========================================
+        // SECCIÓN 2: SISTEMA DE AUDIO (Web Audio API)
+        // ==========================================
+        // Esto reemplaza a las etiquetas <audio> básicas para evitar cortes.
+
+        function initAudioSystem() {
+            // Crea el "Contexto de Audio" (el motor de sonido del navegador)
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            // Crea "Nodos de Ganancia" (como las perillas de volumen de una mesa de DJ)
+            gainNode1 = audioCtx.createGain();
+            gainNode2 = audioCtx.createGain();
+            analyser = audioCtx.createAnalyser(); // Para analizar graves (efecto luna)
+
+            // Configurar volúmenes iniciales
+            gainNode1.gain.value = 1; // Pista 1 (Mamichula) al 100%
+            gainNode2.gain.value = 0; // Pista 2 (Piano) silenciada
+
+            // Decodifica y reproduce Audio 1
+            playBuffer(assetsToLoad[0], gainNode1, true); // true = loop infinito
+            // Prepara Audio 2 pero empieza en silencio
+            playBuffer(assetsToLoad[1], gainNode2, true);
+
+            // Conexiones: Fuente -> Volumen -> Analizador -> Bocinas
+            gainNode1.connect(analyser);
+            gainNode2.connect(analyser);
+            analyser.connect(audioCtx.destination);
+
+            visualizeAudio(); // Inicia la animación de la luna
+        }
+
+        // Función auxiliar para decodificar y tocar un audio desde memoria
+        async function playBuffer(url, gainNode, loop) {
+            // Copia los datos del buffer
+            const buffer = await audioCtx.decodeAudioData(audioBuffers[url].slice(0));
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.loop = loop;
+            source.connect(gainNode); // Lo conecta a su perilla de volumen
+            source.start(0); // Play
+        }
+
+        // Transición Profesional (Crossfade)
+        // Baja una canción y sube la otra suavemente en 3 segundos
+        function crossfadeMusic() {
+            const t = audioCtx.currentTime;
+
+            // Pista 1: Baja a 0
+            gainNode1.gain.setValueAtTime(gainNode1.gain.value, t);
+            gainNode1.gain.linearRampToValueAtTime(0, t + 3);
+
+            // Pista 2: Sube a 1
+            gainNode2.gain.setValueAtTime(gainNode2.gain.value, t);
+            gainNode2.gain.linearRampToValueAtTime(1, t + 3);
+        }
+
+        // ==========================================
+        // SECCIÓN 3: INTERFAZ TERMINAL
+        // ==========================================
+        const consoleDiv = document.getElementById('console-text');
+        const loader = document.getElementById('terminal-loader');
+
+        const terminalText = [
+            "> System check...",
+            "> Protocol: KINTSUGI initializing...",
+            "> Optimizing assets...",
+            "> Ready."
+        ];
+        let lineIdx = 0, charIdx = 0;
+
+        // Efecto máquina de escribir recursivo
+        function typeWriter() {
+            if (lineIdx < terminalText.length) {
+                if (charIdx < terminalText[lineIdx].length) {
+                    consoleDiv.innerHTML += terminalText[lineIdx].charAt(charIdx);
+                    charIdx++;
+                    setTimeout(typeWriter, 30); // Velocidad escritura
+                } else {
+                    consoleDiv.innerHTML += "<br>";
+                    lineIdx++;
+                    charIdx = 0;
+                    setTimeout(typeWriter, 200); // Pausa entre líneas
+                }
             }
         }
 
-        // Inicia la animación de texto al cargar
-        typeWriter();
+        // Arrancar carga inmediatamente al abrir la página
+        loadAssets();
 
-        // Variables para el análisis de audio (Web Audio API)
-        let audioContext, analyser, source;
-
-        // Evento principal para iniciar la experiencia (requiere interacción usuario por política de navegador)
+        // Evento al dar click en "Ejecutar Protocolo"
         enterBtn.addEventListener('click', () => {
-            // 1. Iniciar Audio Context (Necesario por reglas del navegador para autoplay)
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
+            initAudioSystem(); // IMPORTANTE: El audio solo puede iniciar tras un clic del usuario
 
-            // Conectar Audio 1 (Mamichula) al analizador para efectos visuales
-            source = audioContext.createMediaElementSource(audio1);
-            const source2 = audioContext.createMediaElementSource(audio2); // También el piano
-
-            // Ruteo: Audio -> Analizador -> Bocinas
-            source.connect(analyser);
-            source2.connect(analyser);
-            analyser.connect(audioContext.destination);
-            // (Truco: conectamos ambos, aunque solo suene uno a la vez)
-            // Nota simplificada: Para no complicar el código con doble fuente, 
-            // el visualizador reaccionará principalmente al audio activo si gestionamos bien el volumen.
-
-            audio1.play(); // Inicia música 1
-
-            // UI: Desvanecer loader y eliminarlo del flujo
+            // Animación de desvanecer la pantalla negra
+            loader.style.transition = "opacity 1s";
             loader.style.opacity = "0";
-            setTimeout(() => { loader.style.display = "none"; }, 1000);
+            setTimeout(() => loader.style.display = "none", 1000);
 
-            // INICIAR BUCLE DE ANIMACIÓN VISUAL
-            visualize();
+            // Iniciar Mariposas
+            initButterflies();
         });
 
-        // Función de visualización de audio (sincroniza la Luna con los bajos)
-        function visualize() {
-            // Array para guardar datos de frecuencia (Graves, Medios, Agudos)
+        // ==========================================
+        // SECCIÓN 4: CANVAS MARIPOSAS (Optimizado)
+        // ==========================================
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let butterflies = [];
+
+        // Ajusta el tamaño del canvas si gira el celular
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Clase que define cómo es y cómo se mueve una mariposa
+        class Butterfly {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                // Posición aleatoria
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 20 + 10;
+                this.speed = Math.random() * 1 + 0.5;
+                this.angle = 0;
+                this.angleSpeed = Math.random() * 0.1 - 0.05;
+                this.opacity = 0;
+                this.fadeIn = true;
+                this.emoji = "🦋";
+            }
+
+            update() {
+                // Matemáticas para movimiento fluido (seno/coseno)
+                this.y -= this.speed; // Subir
+                this.x += Math.sin(this.y * 0.02) * 0.5; // Oscilar
+                this.angle += this.angleSpeed; // Rotar
+
+                // Control de opacidad (aparecer suavemente)
+                if (this.fadeIn) {
+                    this.opacity += 0.01;
+                    if (this.opacity >= 1) this.fadeIn = false;
+                } else if (this.y < -50) {
+                    this.init(); // Si sale de pantalla arriba, se recicla abajo
+                }
+
+                // Dibujar en el canvas
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.font = `${this.size}px serif`;
+                ctx.shadowColor = "#00FFFF";
+                ctx.shadowBlur = 10;
+                ctx.fillText(this.emoji, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        // Crea 50 mariposas y las anima en bucle
+        function initButterflies() {
+            for (let i = 0; i < 50; i++) {
+                butterflies.push(new Butterfly());
+                butterflies[i].y = Math.random() * canvas.height;
+            }
+            animateButterflies();
+        }
+
+        function animateButterflies() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Borra frame anterior
+            butterflies.forEach(b => b.update()); // Mueve cada mariposa
+            requestAnimationFrame(animateButterflies); // Pide siguiente frame
+        }
+
+        // ==========================================
+        // SECCIÓN 5: LÓGICA DE SCROLL Y EVENTOS
+        // ==========================================
+
+        // Scroll Reveal: Hace aparecer las estrofas suavemente
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.stanza, .swiper').forEach(el => observer.observe(el));
+
+        // Control de Scroll para Audio y Fondo
+        const musicTrigger = document.getElementById('music-trigger');
+        let musicSwitched = false;
+
+        window.addEventListener('scroll', () => {
+            // Calcular porcentaje de scroll para cambiar el color de fondo
+            const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+            const bgContainer = document.getElementById('bg-canvas');
+
+            // Fases del color de fondo según la historia
+            if (scrollPercent < 30) {
+                bgContainer.style.background = "radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%)";
+            } else if (scrollPercent < 60) {
+                bgContainer.style.background = "radial-gradient(circle at bottom, #3b0a15 0%, #050510 70%)";
+            } else {
+                bgContainer.style.background = "radial-gradient(circle at bottom, #2e2a0b 0%, #050510 70%)";
+            }
+
+            // Efecto Parallax Luna
+            const moon = document.getElementById('moon');
+            moon.style.transform = `translateY(${window.scrollY * 0.2}px)`;
+
+            // Cambio de Música (Mamichula -> Piano)
+            const triggerPos = musicTrigger.getBoundingClientRect().top;
+            if (triggerPos < window.innerHeight / 1.5 && !musicSwitched && audioCtx) {
+                musicSwitched = true;
+                crossfadeMusic();
+            }
+        });
+
+        // Visualizador de Audio (Latido de la luna)
+        function visualizeAudio() {
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
             function draw() {
-                requestAnimationFrame(draw); // Llama a la función en cada frame de refresco
+                requestAnimationFrame(draw);
                 analyser.getByteFrequencyData(dataArray);
-
-                // Obtenemos el promedio de volumen de los bajos (primeros bins del array)
                 let bass = 0;
-                for (let i = 0; i < 10; i++) {
-                    bass += dataArray[i];
-                }
-                const bassAverage = bass / 10; // Valor entre 0 y 255
+                // Tomamos promedio de graves
+                for (let i = 0; i < 10; i++) bass += dataArray[i];
+                const bassAvg = bass / 10;
 
-                // APLICAR AL DOM (Hacer que la luna palpite)
-                // Escala normal 1, crece hasta 1.2 con el bajo
-                const scale = 1 + (bassAverage / 500);
+                // Aplicamos escala a la luna
+                const scale = 1 + (bassAvg / 500);
                 const moon = document.getElementById('moon');
-
-                // Si existe la luna, la hacemos latir según la música
-                if (moon) {
-                    moon.style.transform = `scale(${scale}) translateY(${window.scrollY * 0.2}px)`;
-                    // También podemos hacer que brille más
-                    moon.style.boxShadow = `0 0 ${bassAverage}px rgba(255, 255, 224, 0.3)`;
-                }
+                // Nota: Mantenemos el translate del scroll aquí también
+                moon.style.transform = `scale(${scale}) translateY(${window.scrollY * 0.2}px)`;
+                moon.style.boxShadow = `0 0 ${bassAvg}px rgba(255, 255, 224, 0.3)`;
             }
             draw();
         }
 
-        // =========================================
-        // 2. GENERADOR DE MARIPOSAS (PARTÍCULAS)
-        // =========================================
-        function createButterfly() {
-            const b = document.createElement('div');
-            b.classList.add('butterfly');
-
-            // 1. POSICIÓN ALEATORIA (Eje X)
-            b.style.left = Math.random() * 100 + "vw";
-
-            // 2. TAMAÑO ALEATORIO (Dinamismo)
-            // Genera mariposas entre 15px (lejos) y 45px (cerca)
-            const size = Math.random() * 30 + 15;
-            b.style.fontSize = size + "px";
-
-            // 3. VELOCIDAD VARIABLE
-            // Las más grandes (cerca) suben más rápido, las pequeñas más lento
-            const duration = (Math.random() * 5 + 8); // Entre 8s y 13s
-            b.style.animation = `fly ${duration}s linear forwards`;
-
-            // 4. OPACIDAD Y DESENFOQUE (Profundidad de campo)
-            // Si es pequeña, es más transparente y borrosa (está lejos)
-            const opacity = Math.random() * 0.5 + 0.4; // Entre 0.4 y 0.9
-            b.style.setProperty('--opacity', opacity);
-
-            if (size < 25) {
-                b.style.filter = "blur(2px)"; // Efecto de desenfoque para las lejanas
-            }
-
-            document.getElementById('canvas-container').appendChild(b);
-
-            // Limpieza de memoria: Eliminar del DOM al terminar animación
-            setTimeout(() => { b.remove() }, duration * 1000);
-        }
-
-        // GENERACIÓN MASIVA
-        // Antes era 800ms. Ahora 500ms = ¡Muchas más mariposas!
-        setInterval(createButterfly, 500);
-
-        // =========================================
-        // 3. SCROLL REVEAL (Aparición del poema)
-        // =========================================
-        // IntersectionObserver detecta cuando los elementos entran en el viewport
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible'); // Añade clase CSS que activa transición
-                }
-            });
-        }, { threshold: 0.1 }); // Se activa cuando el 10% del elemento es visible
-
-        document.querySelectorAll('.stanza, .swiper').forEach(el => observer.observe(el));
-
-        // =========================================
-        // 4. CONTROL DE AUDIO DUAL & LOGICA CARRUSEL
-        // =========================================
-        // Detectar cuando llegamos a la zona de cambio (Elementos)
-        const musicTrigger = document.getElementById('music-trigger');
-        const galleryTrigger = document.getElementById('gallery-trigger');
-        let musicSwitched = false; // Flag para que ocurra solo una vez
-
-        window.addEventListener('scroll', () => {
-            const triggerPosition = musicTrigger.getBoundingClientRect().top;
-            const galleryPosition = galleryTrigger.getBoundingClientRect().top;
-            const screenPosition = window.innerHeight;
-
-            // Lógica: Cambio de Mamichula a Piano (En la estrofa de los Elementos)
-            if (triggerPosition < screenPosition / 1.5 && !musicSwitched) {
-                musicSwitched = true;
-                crossfadeAudio(audio1, audio2);
-            }
-
-            // Lógica: Asegurar volumen máximo al llegar al Carrusel
-            if (galleryPosition < screenPosition / 2) {
-                if (audio2.volume < 0.9) audio2.volume = 1.0;
-            }
-        });
-
-        // Función para mezclar suavemente dos pistas (Crossfade)
-        function crossfadeAudio(trackOut, trackIn) {
-            trackIn.volume = 0;
-            trackIn.play();
-
-            let vol = 0;
-            const interval = setInterval(() => {
-                if (vol < 1) {
-                    vol += 0.05;
-                    // Sube volumen de la nueva, baja el de la vieja
-                    trackIn.volume = Math.min(vol, 1);
-                    trackOut.volume = Math.max(1 - vol, 0);
-                } else {
-                    trackOut.pause();
-                    clearInterval(interval);
-                }
-            }, 200); // Transición suave de 4 segundos aprox (200ms * 20 pasos)
-        }
-
-        // =========================================
-        // 5. CONFIGURACIÓN DEL CARRUSEL (SWIPER)
-        // =========================================
+        // ==========================================
+        // SECCIÓN 6: CONFIGURACIÓN SWIPER (CARRUSEL)
+        // ==========================================
         const swiper = new Swiper(".mySwiper", {
-            effect: "cards",       // Efecto de baraja de cartas (muy romántico)
-            grabCursor: true,      // Manita para agarrar
-            loop: true,            // Bucle infinito (puedes girar y girar)
-
-            // Configuración visual de las cartas
-            cardsEffect: {
-                perSlideOffset: 8, // Separación entre cartas
-                perSlideRotate: 2, // Rotación sutil
-                slideShadows: true, // Sombras realistas
-            },
-
-            pagination: {
-                el: ".swiper-pagination",
-                dynamicBullets: true, // Bolitas que cambian de tamaño
-            },
-
-            // LÓGICA INTELIGENTE DE REPRODUCCIÓN DE VIDEO
+            effect: "cards",
+            grabCursor: true,
+            loop: true,
+            cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, slideShadows: true },
+            pagination: { el: ".swiper-pagination", dynamicBullets: true },
             on: {
-                // Cuando cambias de slide (diapositiva)
+                // Auto-play de videos solo en la slide activa
                 slideChangeTransitionEnd: function () {
-                    // 1. Pausar TODOS los videos primero (para que no suenen mezclados)
-                    document.querySelectorAll('.slide-video').forEach(vid => {
-                        vid.pause();
-                        vid.currentTime = 0; // Reiniciar video
-                    });
-
-                    // 2. Buscar si el slide ACTIVO tiene un video
+                    document.querySelectorAll('.slide-video').forEach(v => { v.pause(); v.currentTime = 0; });
                     const activeSlide = this.slides[this.activeIndex];
-                    const activeVideo = activeSlide.querySelector('video');
-
-                    // 3. Si hay video, darle Play
-                    if (activeVideo) {
-                        activeVideo.play();
-                    }
+                    const vid = activeSlide.querySelector('video');
+                    if (vid) vid.play();
                 }
             }
         });
 
-        // =========================================
-        // MEJORAS DE INTERACTIVIDAD (TOUCH & PARALLAX)
-        // =========================================
+        // Destellos mágicos al tocar la pantalla
+        document.addEventListener('click', e => createSparkle(e.pageX, e.pageY));
+        document.addEventListener('touchstart', e => createSparkle(e.touches[0].pageX, e.touches[0].pageY));
 
-        // --- DESTELLOS AL TOCAR ---
-        document.addEventListener('click', (e) => {
-            createSparkle(e.pageX, e.pageY);
-        });
-
-        // También para touch en celular
-        document.addEventListener('touchstart', (e) => {
-            // touchstart puede tener múltiples toques, tomamos el primero
-            const touch = e.touches[0];
-            createSparkle(touch.pageX, touch.pageY);
-        });
-
-        // Crea una partícula efímera en la coordenada X,Y
         function createSparkle(x, y) {
             const s = document.createElement('div');
             s.classList.add('sparkle');
-            s.style.left = x + 'px';
-            s.style.top = y + 'px';
+            s.style.left = x + 'px'; s.style.top = y + 'px';
             document.body.appendChild(s);
-
-            // Color aleatorio entre Dorado, Cyan y Blanco
-            const colors = ['#FFD700', '#00FFFF', '#FFFFFF'];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            s.style.background = randomColor;
-            s.style.boxShadow = `0 0 10px ${randomColor}`;
-
-            // Se autodestruye al segundo
-            setTimeout(() => { s.remove(); }, 1000);
+            setTimeout(() => s.remove(), 1000);
         }
 
-        // --- LÓGICA PARALLAX DE LA LUNA ---
-        window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-            const moon = document.getElementById('moon');
-            // La luna se mueve a 1/5 de la velocidad del scroll (efecto profundidad visual)
-            moon.style.transform = `translateY(${scrollY * 0.2}px)`;
-        });
-
-        // --- TÍTULO DINÁMICO (Cambia si el usuario sale de la pestaña) ---
-        const originalTitle = document.title;
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                document.title = "Vuelve albondiguita... 🦋"; // Mensaje para atraer atención
-            } else {
-                document.title = originalTitle;
-            }
-        });
-
-        // --- ILUMINACIÓN DINÁMICA DE FONDO (GRADIENTES) ---
-        window.addEventListener('scroll', () => {
-            // Calcula porcentaje de scroll total
-            const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-            const bg = document.getElementById('canvas-container');
-
-            // 0% - 30%: Inicio (Azul Noche Triste)
-            if (scrollPercent < 30) {
-                bg.style.background = "radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%)";
-            }
-            // 30% - 60%: Pasión/Caos (Tinte Púrpura Rojizo - sección sexual/caos)
-            else if (scrollPercent >= 30 && scrollPercent < 60) {
-                bg.style.background = "radial-gradient(circle at bottom, #3b0a15 0%, #050510 70%)";
-            }
-            // 60% - 100%: Paz/Oro (Tinte Dorado Cálido - resolución y propuesta)
-            else {
-                bg.style.background = "radial-gradient(circle at bottom, #2e2a0b 0%, #050510 70%)";
-            }
-        });
-
-        // =========================================
-        // 6. CANDADO BIOMÉTRICO (LONG PRESS LOGIC)
-        // =========================================
-        const btn = document.getElementById('fingerprint-btn');
-        const fill = document.getElementById('fill-bar');
+        // ==========================================
+        // SECCIÓN 7: CANDADO BIOMÉTRICO (Mantener presionado)
+        // ==========================================
+        const lockBtn = document.getElementById('fingerprint-btn');
+        const fillBar = document.getElementById('fill-bar');
         const vowBox = document.getElementById('final-vow-box');
         const lockScreen = document.getElementById('lock-screen');
-        let holdTimer;
-        let progress = 0;
+        let holdTimer, progress = 0;
 
-        // Función que inicia el llenado de la barra al presionar
-        const startHold = () => {
-            // Vibración si es celular (Haptic Feedback)
-            if (navigator.vibrate) navigator.vibrate(50);
-
+        // Inicia el llenado
+        const startHold = (e) => {
+            if (e.type === 'touchstart') e.preventDefault(); // Evita menú contextual en móvil
+            if (navigator.vibrate) navigator.vibrate(50); // Vibración háptica
             holdTimer = setInterval(() => {
-                progress += 2; // Velocidad de llenado (incremento por ciclo)
-                fill.style.height = progress + '%';
-
-                // Si llega al 100%, ejecutamos desbloqueo
-                if (progress >= 100) {
-                    unlockVow();
-                }
-            }, 30); // Se ejecuta cada 30ms
+                progress += 2;
+                fillBar.style.height = progress + '%';
+                if (progress >= 100) unlock(); // Si llega a 100, desbloquea
+            }, 30);
         };
 
-        // Función para cancelar si el usuario suelta antes de tiempo
+        // Cancela si suelta antes
         const endHold = () => {
             clearInterval(holdTimer);
-            if (progress < 100) {
-                progress = 0; // Reinicia progreso
-                fill.style.height = '0%';
-            }
+            if (progress < 100) { progress = 0; fillBar.style.height = '0%'; }
         };
 
-        // Lógica de éxito al desbloquear
-        function unlockVow() {
+        // Éxito: Desbloqueo
+        function unlock() {
             clearInterval(holdTimer);
-            // 1. Vibración larga de éxito (patrón)
             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
-            // 2. Efecto visual de explosión/desaparición del candado
+            // Animación de explosión
             lockScreen.style.transition = "opacity 1s, transform 1s";
             lockScreen.style.opacity = "0";
-            lockScreen.style.transform = "scale(1.5)"; // Explosión
+            lockScreen.style.transform = "scale(1.5)";
             setTimeout(() => lockScreen.style.display = 'none', 1000);
 
-            // 3. Revelar Votos (quita filtro blur)
+            // Muestra el texto final
             vowBox.classList.remove('locked');
             vowBox.classList.add('unlocked');
 
-            // 4. Subir música al máximo (Clímax emocional)
-            const audio2 = document.getElementById('audio2');
-            audio2.volume = 1.0;
-
-            // AQUÍ ES TU SEÑAL PARA SACAR EL ANILLO (Nota para el usuario)
+            // CLIMAX DE AUDIO: Sube el volumen al máximo
+            if (gainNode2) {
+                const t = audioCtx.currentTime;
+                gainNode2.gain.linearRampToValueAtTime(1.0, t + 1);
+            }
         }
 
-        // Listeners para Mouse (PC) y Touch (Celular)
-        btn.addEventListener('mousedown', startHold);
-        btn.addEventListener('mouseup', endHold);
-        btn.addEventListener('mouseleave', endHold); // Si saca el mouse del botón
+        // Listeners para Mouse y Touch
+        lockBtn.addEventListener('mousedown', startHold);
+        lockBtn.addEventListener('mouseup', endHold);
+        lockBtn.addEventListener('mouseleave', endHold);
+        lockBtn.addEventListener('touchstart', startHold);
+        lockBtn.addEventListener('touchend', endHold);
 
-        // PreventDefault evita menús contextuales en móviles al mantener presionado
-        btn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
-        btn.addEventListener('touchend', endHold);
     </script>
 </body>
 
