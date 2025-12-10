@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imperfectamente Feliz - Para Dana</title>
+    <title>Más que un Clic...</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
@@ -509,24 +509,22 @@
             <div class="fill-overlay" id="fill-bar"></div>
             <p style="font-family: 'Courier New'; color: var(--accent-blue); margin-bottom: 20px;">
                 ⚠️ ARCHIVO ENCRIPTADO <br>
-                <span style="font-size: 0.8rem">Mantén presionado para reparar el vínculo</span>
+                <span style="font-size: 1.2rem"><br>¿Desea SANAR el vínculo?<br></span>
             </p>
-            <button id="fingerprint-btn">❤️</button>
+            <button id="fingerprint-btn">❤️‍🩹</button>
         </div>
 
         <div class="stanza final-vow locked" id="final-vow-box">
-            Con esta mano sostendré tus anhelos,<br>
-            tu copa nunca estará vacía;<br>
-            quiero ser tu vino, <br>
-            tu luz en los cielos,<br><br>
+            Con esta mano, reparo la historia,<br>
+            te entrego todo mi corazón;<br>
+            tu paz será mi mayor victoria,<br><br>
             y con este anillo...<br>
             <span
-                style="display: block; font-size: clamp(2rem, 5vw, 3.5rem); text-shadow: 0 0 20px gold; margin-top: 20px;">TE
-                PIDO QUE SEAS MÍA</span>
+                style="display: block; font-size: clamp(2rem, 5vw, 3rem); text-shadow: 0 0 20px gold; margin-top: 20px;">TE
+                PROMETO MI MEJOR VERSIÓN</span>
         </div>
 
-        <br><br><br><br>
-        <p style="font-size: 0.8rem; color: #555;">Compilado con amor v3.0 (Optimized)</p>
+        <br>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -537,9 +535,24 @@
         // ==========================================
         const assetsToLoad = [
             'mamichula.mp3',
-            'piano.mp3'
-            // Opcional: Si quieres pre-cargar la primera foto para que salga instantánea, agrégala aquí:
-            // '1.jpeg' 
+            'piano.mp3',
+            '1.jpeg',
+            '2v.mp4',
+            '3v.mp4',
+            '4.jpeg',
+            '5.jpeg',
+            '6.jpeg',
+            '7v.mp4',
+            '8.jpeg',
+            '9v.mp4',
+            '10.jpeg',
+            '11v.mp4',
+            '12v.mp4',
+            '13v.mp4',
+            '14v.mp4',
+            '15.jpeg',
+            '16v.mp4',
+            '17v.mp4'
         ];
 
         // Variables donde guardaremos la música cargada en memoria
@@ -574,7 +587,7 @@
                     loadedCount++;
                     const percent = Math.floor((loadedCount / assetsToLoad.length) * 100);
                     loadingBar.style.width = percent + "%";
-                    loadingPercent.innerText = "Cargando audio: " + percent + "%";
+                    loadingPercent.innerText = "Cargando recursos: " + percent + "%";
                 } catch (e) {
                     console.error("Error cargando recurso:", url);
                     loadingPercent.innerText = "Error en archivo: " + url;
@@ -585,7 +598,7 @@
             await Promise.all(promises);
 
             // Todo listo: Habilita el botón para entrar
-            loadingPercent.innerText = "Recursos listos. Esperando usuario.";
+            loadingPercent.innerText = "Recursos listos. Esperando usuario...";
             enterBtn.classList.add('active');
         }
 
@@ -653,9 +666,10 @@
 
         const terminalText = [
             "> System check...",
-            "> Protocol: KINTSUGI initializing...",
-            "> Optimizing assets...",
-            "> Ready."
+            "> Critical Error: Heartbroken.",
+            "> Rewriting core memories...",
+            "> Mission: Clarify the truth",
+            "> Protocol: KINTSUGI initialized...",
         ];
         let lineIdx = 0, charIdx = 0;
 
