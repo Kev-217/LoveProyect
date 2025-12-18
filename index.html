@@ -339,6 +339,30 @@
                 opacity: 0;
             }
         }
+
+        /* RESPONSIVIDAD */
+        /* PC: */
+        @media (min-width: 768px) {
+            .poem-container {
+                max-width: 800px;
+            }
+
+            .stanza {
+                font-size: 1.5rem;
+                padding: 60px;
+            }
+
+            .swiper {
+                width: 500px;
+            }
+        }
+
+        /* Móvil: */
+        .stanza {
+            /* Mantener el texto balanceado para que no se corten los versos */
+            text-wrap: balance;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 
@@ -645,17 +669,17 @@
         }
 
         // Transición Profesional (Crossfade)
-        // Baja una canción y sube la otra suavemente en 3 segundos
+        // Baja una canción y sube la otra suavemente en 2 segundos
         function crossfadeMusic() {
             const t = audioCtx.currentTime;
 
             // Pista 1: Baja a 0
             gainNode1.gain.setValueAtTime(gainNode1.gain.value, t);
-            gainNode1.gain.linearRampToValueAtTime(0, t + 3);
+            gainNode1.gain.linearRampToValueAtTime(0, t + 2);
 
             // Pista 2: Sube a 1
             gainNode2.gain.setValueAtTime(gainNode2.gain.value, t);
-            gainNode2.gain.linearRampToValueAtTime(1, t + 3);
+            gainNode2.gain.linearRampToValueAtTime(1, t + 2);
         }
 
         // ==========================================
@@ -679,12 +703,12 @@
                 if (charIdx < terminalText[lineIdx].length) {
                     consoleDiv.innerHTML += terminalText[lineIdx].charAt(charIdx);
                     charIdx++;
-                    setTimeout(typeWriter, 30); // Velocidad escritura
+                    setTimeout(typeWriter, 20); // Velocidad escritura
                 } else {
                     consoleDiv.innerHTML += "<br>";
                     lineIdx++;
                     charIdx = 0;
-                    setTimeout(typeWriter, 200); // Pausa entre líneas
+                    setTimeout(typeWriter, 100); // Pausa entre líneas
                 }
             }
         }
@@ -782,7 +806,7 @@
 
                 // Sombra (Glow) Azul Cyan
                 ctx.shadowColor = "#00FFFF";
-                ctx.shadowBlur = 15;
+                ctx.shadowBlur = 20;
 
                 // Ajuste de posición para centrar al escalar
                 ctx.fillText(this.emoji, -this.size / 2, this.size / 2);
@@ -794,8 +818,8 @@
         function initButterflies() {
             // Limpiamos el array por si acaso
             butterflies = [];
-            // Crear 60 mariposas
-            for (let i = 0; i < 40; i++) {
+            // Crear 30 mariposas
+            for (let i = 0; i < 30; i++) {
                 butterflies.push(new Butterfly());
                 // Esparcirlas inicialmente en Y
                 butterflies[i].y = Math.random() * canvas.height;
