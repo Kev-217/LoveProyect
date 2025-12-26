@@ -250,6 +250,39 @@
             pointer-events: none;
         }
 
+        /* --- ESTILOS DEL CÓDIGO SECRETO --- */
+        #passcode-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #0f0; /* Línea verde hacker */
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 2rem;
+            width: 100px;
+            text-align: center;
+            letter-spacing: 10px;
+            outline: none;
+        }
+
+        #passcode-input::placeholder {
+            color: rgba(0, 255, 0, 0.3);
+        }
+
+        /* Animación de error (temblor) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-animation {
+            animation: shake 0.3s ease-in-out;
+            border-bottom: 2px solid red !important;
+            color: red !important;
+        }
+
         /* Caja del Candado */
         #lock-screen {
             text-align: center;
@@ -370,11 +403,19 @@
 
     <div id="terminal-loader">
         <div class="typing-effect" id="console-text"></div>
-        <div id="loading-bar-container">
-            <div id="loading-bar"></div>
+        
+        <div id="access-panel" style="display: none; text-align: center; margin-top: 20px;">
+            <p style="color: #0f0; font-family: 'Courier New'; margin-bottom: 10px;">INGRESE CÓDIGO DE ACCESO:</p>
+            
+            <input type="text" id="passcode-input" maxlength="3" autocomplete="off" placeholder="_ _ _">
+            
+            <br><br>
+            <button id="enter-btn">[ DESENCRIPTAR ]</button>
+            
+            <p id="error-msg" style="color: red; font-family: 'Courier New'; display: none; margin-top: 10px;">
+                ⚠️ ACCESO DENEGADO
+            </p>
         </div>
-        <p id="loading-percent" style="font-size: 0.8rem; margin-bottom: 20px; color: #555;">0%</p>
-        <button id="enter-btn">[ EJECUTAR PROTOCOLO KINTSUGI ]</button>
     </div>
 
     <canvas id="bg-canvas"></canvas>
@@ -603,18 +644,13 @@
             'piano.mp3',
             '1.jpeg',
             '2v.mp4',
-            '3v.mp4',
             '4.jpeg',
             '5.jpeg',
             '6.jpeg',
-            '7v.mp4',
             '8.jpeg',
-            '9v.mp4',
             '10.jpeg',
             '11v.mp4',
-            '12v.mp4',
             '13v.mp4',
-            '14v.mp4',
             '15.jpeg',
             '16v.mp4',
             '17v.mp4'
@@ -625,17 +661,10 @@
         // Variables del sistema de audio profesional (Web Audio API)
         let audioCtx, gainNode1, gainNode2, source1, source2, analyser;
 
-        // Referencias a los elementos visuales de carga
-        const loadingBar = document.getElementById('loading-bar');
-        const loadingPercent = document.getElementById('loading-percent');
         const enterBtn = document.getElementById('enter-btn');
-        const barContainer = document.getElementById('loading-bar-container');
 
         // Función asíncrona: Carga los archivos uno por uno
         async function loadAssets() {
-            barContainer.style.display = "block"; // Muestra la barra
-            let loadedCount = 0;
-
             // Iniciamos el texto de "hacker" visual mientras carga lo real
             typeWriter();
 
@@ -648,23 +677,13 @@
                     const arrayBuffer = await response.arrayBuffer();
                     audioBuffers[url] = arrayBuffer; // Lo guarda en memoria
 
-                    // Actualiza la barra de progreso
-                    loadedCount++;
-                    const percent = Math.floor((loadedCount / assetsToLoad.length) * 100);
-                    loadingBar.style.width = percent + "%";
-                    loadingPercent.innerText = "Cargando recursos: " + percent + "%";
                 } catch (e) {
                     console.error("Error cargando recurso:", url);
-                    loadingPercent.innerText = "Error en archivo: " + url;
                 }
             });
 
             // Espera a que TODO se descargue antes de continuar
             await Promise.all(promises);
-
-            // Todo listo: Habilita el botón para entrar
-            loadingPercent.innerText = "Recursos listos. Esperando usuario...";
-            enterBtn.classList.add('active');
         }
 
         // ==========================================
@@ -751,24 +770,68 @@
                     charIdx = 0;
                     setTimeout(typeWriter, 100); // Pausa entre líneas
                 }
+            } else {
+                const panel = document.getElementById('access-panel');
+                if(panel) {
+                    panel.style.display = 'block';
+                    document.getElementById('passcode-input').focus();
+                }
             }
         }
 
         // Arrancar carga inmediatamente al abrir la página
         loadAssets();
 
-        // Evento al dar click en "Ejecutar Protocolo"
-        enterBtn.addEventListener('click', () => {
-            initAudioSystem(); // IMPORTANTE: El audio solo puede iniciar tras un clic del usuario
-
-            // Animación de desvanecer la pantalla negra
+        // ==========================================
+        // LÓGICA DE VALIDACIÓN (CÓDIGO 544) - VERSIÓN MEJORADA
+        // ==========================================
+        const passInput = document.getElementById('passcode-input');
+        const errorMsg = document.getElementById('error-msg');
+        
+        function startExperience() {
+            initAudioSystem(); // Inicia el audio
+            
+            // Quita la pantalla negra
             loader.style.transition = "opacity 1s";
             loader.style.opacity = "0";
             setTimeout(() => loader.style.display = "none", 1000);
+            
+            // Inicia mariposas (Con protección por si fallan)
+            if(typeof initButterflies === 'function') initButterflies();
+        }
 
-            // Iniciar Mariposas
-            initButterflies();
-        });
+        // Listeners
+        enterBtn.addEventListener('click', validateCode);
+
+        if(passInput) {
+            passInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') validateCode();
+            });
+        }
+
+        function validateCode() {
+            if (passInput.value === "544") {
+                // --- CORRECTO ---
+                if(errorMsg) errorMsg.style.display = 'none';
+                passInput.style.borderBottom = "2px solid #00FFFF"; 
+                
+                // Mensaje bonito (del código B)
+                consoleDiv.innerHTML += "<br>> <span style='color:#00FFFF'>ACCESS GRANTED. WELCOME HOME.</span>";
+                
+                setTimeout(startExperience, 1000); 
+
+            } else {
+                // --- INCORRECTO ---
+                if (navigator.vibrate) navigator.vibrate(200);
+                if(errorMsg) errorMsg.style.display = 'block';
+                
+                passInput.classList.add('shake-animation');
+                setTimeout(() => {
+                    passInput.classList.remove('shake-animation');
+                    passInput.value = "";
+                }, 500);
+            }
+        }
 
         // ==========================================
         // MEJORA 2: MARIPOSAS EN CANVAS
