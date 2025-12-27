@@ -74,29 +74,6 @@
             /* Reserva espacio para que no "brinque" al escribir */
         }
 
-        /* Barra de carga real */
-        #loading-bar-container {
-            width: 80%;
-            max-width: 400px;
-            height: 4px;
-            background: #333;
-            /* Fondo oscuro de la barra */
-            margin-bottom: 20px;
-            display: none;
-            /* Se oculta hasta que JS lo activa */
-        }
-
-        #loading-bar {
-            height: 100%;
-            width: 0%;
-            /* Empieza vacía */
-            background: var(--accent-blue);
-            transition: width 0.2s;
-            /* Animación suave al llenarse */
-            box-shadow: 0 0 10px var(--accent-blue);
-            /* Brillo neón */
-        }
-
         /* Botón de inicio */
         #enter-btn {
             padding: 15px 30px;
@@ -140,6 +117,7 @@
             background: radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%);
             transition: background 3s ease;
             /* Cambio de color suave al hacer scroll */
+            filter: hue-rotate(220deg) brightness(150%) contrast(120%) drop-shadow(0 0 5px #00FFFF);
         }
 
         /* =========================================
@@ -171,6 +149,16 @@
             opacity: 0;
             transform: translateY(50px) scale(0.9);
             transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform, opacity;
+        }
+
+        /* Optimización móvil: Reducir calidad del cristal en pantallas pequeñas */
+        @media (max-width: 768px) {
+            .stanza {
+                backdrop-filter: none; /* Desactivar blur pesado en móvil */
+                background: rgba(20, 20, 30, 0.85); /* Fondo un poco más sólido para compensar */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Sombra más simple */
+            }
         }
 
         /* Cuando JS detecta que es visible, le añade esta clase */
@@ -596,17 +584,17 @@
         <div class="swiper mySwiper" id="gallery-trigger">
             <div class="swiper-wrapper">
                 <div class="swiper-slide"><img src="1.jpeg" loading="lazy"></div>
-                <div class="swiper-slide"><video src="2v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><video src="2v.mp4" muted loop playsinline class="slide-video" preload="none"></video></div>
                 <div class="swiper-slide"><img src="4.jpeg" loading="lazy"></div>
                 <div class="swiper-slide"><img src="5.jpeg" loading="lazy"></div>
                 <div class="swiper-slide"><img src="6.jpeg" loading="lazy"></div>
                 <div class="swiper-slide"><img src="8.jpeg" loading="lazy"></div>
                 <div class="swiper-slide"><img src="10.jpeg" loading="lazy"></div>
-                <div class="swiper-slide"><video src="11v.mp4" muted loop playsinline class="slide-video"></video></div>
-                <div class="swiper-slide"><video src="13v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><video src="11v.mp4" muted loop playsinline class="slide-video" preload="none"></video></div>
+                <div class="swiper-slide"><video src="13v.mp4" muted loop playsinline class="slide-video" preload="none"></video></div>
                 <div class="swiper-slide"><img src="15.jpeg" loading="lazy"></div>
-                <div class="swiper-slide"><video src="16v.mp4" muted loop playsinline class="slide-video"></video></div>
-                <div class="swiper-slide"><video src="17v.mp4" muted loop playsinline class="slide-video"></video></div>
+                <div class="swiper-slide"><video src="16v.mp4" muted loop playsinline class="slide-video" preload="none"></video></div>
+                <div class="swiper-slide"><video src="17v.mp4" muted loop playsinline class="slide-video" preload="none"></video></div>
             </div>
             <div class="swiper-pagination"></div>
         </div>
@@ -655,6 +643,9 @@
             '16v.mp4',
             '17v.mp4'
         ];
+
+        // Variable para el scroll
+        let currentScrollY = 0;
 
         // Variables donde guardaremos la música cargada en memoria
         let audioBuffers = {};
@@ -894,10 +885,6 @@
                 // 4. DIBUJADO
                 ctx.save();
 
-                // APLICAR FILTRO AZUL ESPECTRAL
-                // Esto fuerza el color azul brillante y el brillo
-                ctx.filter = 'hue-rotate(220deg) brightness(150%) contrast(120%)';
-
                 ctx.globalAlpha = this.opacity;
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
@@ -910,7 +897,6 @@
 
                 // Sombra (Glow) Azul Cyan
                 ctx.shadowColor = "#00FFFF";
-                ctx.shadowBlur = 20;
 
                 // Ajuste de posición para centrar al escalar
                 ctx.fillText(this.emoji, -this.size / 2, this.size / 2);
@@ -954,48 +940,52 @@
         let musicSwitched = false;
 
         window.addEventListener('scroll', () => {
-            // Calcular porcentaje de scroll para cambiar el color de fondo
-            const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-            const bgContainer = document.getElementById('bg-canvas');
-
-            // Fases del color de fondo según la historia
-            if (scrollPercent < 30) {
-                bgContainer.style.background = "radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%)";
-            } else if (scrollPercent < 60) {
-                bgContainer.style.background = "radial-gradient(circle at bottom, #3b0a15 0%, #050510 70%)";
-            } else {
-                bgContainer.style.background = "radial-gradient(circle at bottom, #2e2a0b 0%, #050510 70%)";
+            currentScrollY = window.scrollY; // Solo guardamos el valor
+            
+            // Lógica ligera para el cambio de música (esto está bien aquí)
+            if (!musicSwitched && musicTrigger) {
+                const triggerPos = musicTrigger.getBoundingClientRect().top;
+                if (triggerPos < window.innerHeight / 1.5 && audioCtx) {
+                    musicSwitched = true;
+                    crossfadeMusic();
+                }
             }
-
-            // Efecto Parallax Luna
-            const moon = document.getElementById('moon');
-            moon.style.transform = `translateY(${window.scrollY * 0.2}px)`;
-
-            // Cambio de Música (Mamichula -> Piano)
-            const triggerPos = musicTrigger.getBoundingClientRect().top;
-            if (triggerPos < window.innerHeight / 1.5 && !musicSwitched && audioCtx) {
-                musicSwitched = true;
-                crossfadeMusic();
-            }
-        });
+        }, { passive: true }); // 'passive: true' mejora el rendimiento del scroll en móviles
 
         // Visualizador de Audio (Latido de la luna)
         function visualizeAudio() {
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const bgContainer = document.getElementById('bg-canvas');
+            const moon = document.getElementById('moon'); // Referencia fuera del loop
+
             function draw() {
                 requestAnimationFrame(draw);
                 analyser.getByteFrequencyData(dataArray);
+                
+                // 1. Cálculo de Audio
                 let bass = 0;
-                // Tomamos promedio de graves
                 for (let i = 0; i < 10; i++) bass += dataArray[i];
                 const bassAvg = bass / 10;
-
-                // Aplicamos escala a la luna
                 const scale = 1 + (bassAvg / 500);
-                const moon = document.getElementById('moon');
-                // Nota: Mantenemos el translate del scroll aquí también
-                moon.style.transform = `scale(${scale}) translateY(${window.scrollY * 0.2}px)`;
+
+                // 2. APLICAR TRANSFORMACIÓN UNIFICADA (Scroll + Audio)
+                // Usamos la variable global 'currentScrollY'
+                moon.style.transform = `translate3d(0, ${currentScrollY * 0.2}px, 0) scale(${scale})`;
                 moon.style.boxShadow = `0 0 ${bassAvg}px rgba(255, 255, 224, 0.3)`;
+
+                // 3. CAMBIO DE COLOR DE FONDO (Optimizado)
+                // Calculamos esto aquí para que sea fluido
+                const docHeight = document.body.scrollHeight - window.innerHeight;
+                const scrollPercent = (currentScrollY / (docHeight || 1)) * 100;
+
+                // Solo cambiamos si es necesario (evita repintados innecesarios)
+                if (scrollPercent < 30) {
+                    bgContainer.style.backgroundImage = "radial-gradient(circle at bottom, #1a0b2e 0%, #050510 70%)";
+                } else if (scrollPercent < 60) {
+                    bgContainer.style.backgroundImage = "radial-gradient(circle at bottom, #3b0a15 0%, #050510 70%)";
+                } else {
+                    bgContainer.style.backgroundImage = "radial-gradient(circle at bottom, #2e2a0b 0%, #050510 70%)";
+                }
             }
             draw();
         }
